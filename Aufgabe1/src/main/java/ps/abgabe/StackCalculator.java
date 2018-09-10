@@ -1,14 +1,13 @@
 package ps.abgabe;
 
-import java.util.Iterator;
-
 public class StackCalculator {
-	/**
-	 * TODO Set list to blackbox
-	 */
-	DataStack<String> stack = new DataStack<>();
-	DataStack<String> outputs = new DataStack<>();
-	DataStack<String> inputs = new DataStack<>();
+
+    /**
+     * TODO Set list to blackbox
+     */
+    DataStack<String> stack = new DataStack<String>();
+    DataStack<String> outputs = new DataStack<String>();
+    DataStack<String> inputs = new DataStack<String>();
 	private Controller controller;
 
 	public StackCalculator() {
@@ -33,8 +32,8 @@ public class StackCalculator {
 	public String evaluate(String expr) {
 		String[] exprArray = expr.split(" ");
 
-		DataStack<Integer> inputs = new DataStack<>();
-		DataStack<String> operators = new DataStack<>();
+        DataStack<Integer> inputs = new DataStack<Integer>();
+        DataStack<String> operators = new DataStack<String>();
 
 		for (String item : exprArray) {
 			if (!Controller.isNumeric(item)) {
@@ -49,7 +48,7 @@ public class StackCalculator {
 		Controller c = new Controller();
 		Integer result = null;
 		Integer index = operators.size();
-		DataStack<String> reverseOperators = new DataStack<>();
+        DataStack<String> reverseOperators = new DataStack<String>();
 		for (Integer i = 0; i < index; i++) {
 			reverseOperators.push(operators.pop());
 		}
@@ -57,6 +56,10 @@ public class StackCalculator {
 		index = reverseOperators.size();
 		for (Integer i = 0; i < index; i++) {
 			String token = reverseOperators.pop();
+			if(token.contains("x")) {
+                System.out.println("X is selected Calculation has been closed");
+                break;
+			}
 			result = c.evaluateOperator(token, inputs);
 			fillResultSecondPlace(inputs, result);
 

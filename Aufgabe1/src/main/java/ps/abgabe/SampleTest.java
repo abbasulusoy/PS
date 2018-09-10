@@ -16,8 +16,8 @@ public class SampleTest{
 		System.out.println("Enter an expression:");
 		String expr=sc.nextLine();
 		String val=calculator.evaluate(expr);
-		System.out.println("val" + val);
-		System.out.println("expr" + expr);
+            System.out.println("result ::: " + val);
+            System.out.println("expression::  " + expr);
 		}
 	}
 }

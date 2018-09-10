@@ -49,6 +49,8 @@ public class Controller {
 			return 1;
 		case "|":
 			return 2;
+		case "~":
+            return 1;
 		case "<":
 			return 2;
 		case ">":
@@ -122,20 +124,26 @@ public class Controller {
 		case "%":
 			result = restOfDivision(arguments.pop(), arguments.pop());
 			break;
+            case "~":
+                result = negation(arguments.pop());
 		}
 
 		return result;
 	}
 
-	/**
-	 * Adds two numbers together
-	 *
-	 * @param a
-	 *            first number
-	 * @param b
-	 *            second number
-	 * @return result
-	 */
+    private Integer negation(Integer pop) {
+        return -pop;
+    }
+
+    /**
+     * Adds two numbers together
+     *
+     * @param a
+     *            first number
+     * @param b
+     *            second number
+     * @return result
+     */
 	private Integer add(Integer a, Integer b) {
 		return a+ b;
 	}
@@ -368,11 +376,15 @@ public class Controller {
 		return false;
 	}
 
+    /**
+     * @param token
+     * @return left associative
+     */
 	public static boolean isLeftAssociative(String token) {
 		if (token.equals("*") || token.equals("/") 
 				|| token.equals("+") || token.equals("-") || token.equals("%") 
 				|| token.equals("|") || token.equals("=") 
-				|| token.equals("<") || token.equals(">")) {
+                || token.equals("<") || token.equals(">") || token.equals("~") || token.equals("x")) {
 			return true;
 		}
 		return false;
