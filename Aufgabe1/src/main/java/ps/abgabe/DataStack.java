@@ -85,4 +85,8 @@ public class DataStack<E> {
 		return list.iterator();
 	}
 	
+    public E get(int index) {
+        return list.get(index);
+    }
+
 }

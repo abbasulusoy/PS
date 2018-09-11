@@ -1,18 +1,14 @@
 package ps.abgabe;
 
+/**
+ * @author Abbas ULUSOY 
+ * fill stacks with operators and values 
+ *
+ */
 public class StackCalculator {
-
-    /**
-     * TODO Set list to blackbox
-     */
     DataStack<String> stack = new DataStack<String>();
     DataStack<String> outputs = new DataStack<String>();
     DataStack<String> inputs = new DataStack<String>();
-	private Controller controller;
-
-	public StackCalculator() {
-		this.controller = new Controller();
-	}
 
 	/**
 	 * @return result
@@ -24,18 +20,20 @@ public class StackCalculator {
 	/**
 	 * Evaluates the expression
 	 *
-	 * @param input
+	 * @param expr
 	 *            - input linked list, each operator/number is stored in the
 	 *            list as an element
 	 * @return string - result as a string
 	 */
 	public String evaluate(String expr) {
-		String[] exprArray = expr.split(" ");
-
+        String[] exprArray = expr.split("");
         DataStack<Integer> inputs = new DataStack<Integer>();
         DataStack<String> operators = new DataStack<String>();
+        DataStack<String> inputsForOutputsToParse = new DataStack<>();
 
 		for (String item : exprArray) {
+            inputsForOutputsToParse.push(item);
+
 			if (!Controller.isNumeric(item)) {
 				for (String nextItem : item.split("")) {
 					fillStacks(inputs, operators, nextItem);
@@ -44,6 +42,7 @@ public class StackCalculator {
 				fillStacks(inputs, operators, item);
 			}
 		}
+        outputs = new Controller().parse(inputsForOutputsToParse);
 
 		Controller c = new Controller();
 		Integer result = null;
@@ -58,6 +57,7 @@ public class StackCalculator {
 			String token = reverseOperators.pop();
 			if(token.contains("x")) {
                 System.out.println("X is selected Calculation has been closed");
+                System.exit(0);
                 break;
 			}
 			result = c.evaluateOperator(token, inputs);
@@ -83,7 +83,7 @@ public class StackCalculator {
 		if (Controller.isNumeric(item)) {
 			inputs.push(Controller.converToNumber(item));
 		} else {
-			if (Controller.isLeftAssociative(item)) {
+			if (Controller.isBinaryOperator(item)) {
 				operators.push(item);
 			}
 		}
