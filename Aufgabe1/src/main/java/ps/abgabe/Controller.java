@@ -10,6 +10,10 @@ public class Controller {
         return getIntValue(value);
     }
 
+    /**
+     * @param str
+     * @return is number than true
+     */
     public static boolean isNumeric(String str) {
         try {
             Integer value = Integer.parseInt(str);
@@ -19,6 +23,10 @@ public class Controller {
         return true;
     }
 
+    /**
+     * @param str
+     * @return integer
+     */
     public static Integer converToNumber(String str) {
         Integer value = null;
         try {
@@ -29,6 +37,10 @@ public class Controller {
         return value;
     }
 
+    /**
+     * @param token
+     * @return true or false 
+     */
     public static boolean isFunctionSeparator(String token) {
         if (token.equals(" ")) {
             return true;
@@ -91,15 +103,6 @@ public class Controller {
             case "%":
                 result = restOfDivision(arguments.pop(), arguments.pop());
                 break;
-            case "~":
-                result = negation(arguments.pop());
-                break;
-            case "c":
-                result = copy(arguments.pop(), arguments);
-                break;
-            case "d":
-                result = delete(arguments.pop(), arguments);
-                break;
             default:
                 result = 0;
         }
@@ -107,30 +110,64 @@ public class Controller {
         return result;
     }
 
-    private Integer delete(Integer find, DataStack<Integer> arguments) {
+    /**
+     * Helper function Checks the operator and applies the corresponding
+     * operation
+     *
+     * @param token
+     *            - the operator
+     * @param arguments
+     *            - list of arguments for the operator
+     */
+    public void evaluateUnaryOperator(String token, DataStack<String> arguments) {
+        switch (token) {
+            case "~":
+                negation(arguments.pop(), arguments);
+                break;
+            case "c":
+                copy(arguments.pop(), arguments);
+                break;
+            case "d":
+                delete(arguments.pop(), arguments);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private void delete(String find, DataStack<String> arguments) {
         if (isIntegerPositiv(find)) {
-            return arguments.get(find);
+            arguments.removeWithIndex(converToNumber(find));
+        }
+    }
+
+    private String copy(String find, DataStack<String> arguments) {
+        if (isIntegerPositiv(find)) {
+            return arguments.get(converToNumber(find));
         }
         return null;
     }
 
-    private Integer copy(Integer find, DataStack<Integer> arguments) {
-        if (isIntegerPositiv(find)) {
-            return arguments.get(find);
-        }
-        return null;
-    }
-
-    private boolean isIntegerPositiv(Integer find) {
-        if (find < 0) {
-            String message = "error ::" + find + " a positive number.";
+    private boolean isIntegerPositiv(String find) {
+        if (!isInteger(find)) {
+            String message = "error ::" + find + " a not number.";
             throw new IllegalArgumentException(message);
+        } else {
+            int number = converToNumber(find);
+            if (number < 0) {
+                String message = "error ::" + number + " a positive number.";
+                throw new IllegalArgumentException(message);
+
+            }
         }
         return true;
     }
 
-    private Integer negation(Integer pop) {
-        return -pop;
+    private void negation(String pop, DataStack<String> arguments) {
+        if (isIntegerPositiv(pop)) {
+            arguments.push(-converToNumber(pop) + "");
+        }
     }
 
     /**
@@ -409,9 +446,9 @@ public class Controller {
      * @return left associative
      */
     public boolean isUnaryOperator(String token) {
-        if (isNegation(token) || isExit(token) || isApplyImmediately(token) || isApplyLater(token) || isDelete(token) || isReadRegister(token) || isWriteRegister(token)
-                || isCopy(token) || isInteger(token) || isNoEmptyListCheck(token) || isStackSize(token)
-                || isDivideList(token) || isCombine(token)) {
+        if (isNegation(token) || isExit(token) || isApplyImmediately(token) || isApplyLater(token) || isDelete(token)
+                || isReadRegister(token) || isWriteRegister(token) || isCopy(token) || isInteger(token)
+                || isNoEmptyListCheck(token) || isStackSize(token) || isDivideList(token) || isCombine(token)) {
             return true;
         }
         return false;

@@ -89,4 +89,8 @@ public class DataStack<E> {
         return list.get(index);
     }
 
+    public E removeWithIndex(int index) {
+        return list.remove(index);
+    }
+
 }
