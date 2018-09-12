@@ -130,10 +130,21 @@ public class Controller {
             case "d":
                 delete(arguments.pop(), arguments);
                 break;
+            case "a":
+                applimmediately(arguments.pop(), arguments);
+                break;
             default:
                 break;
         }
 
+    }
+
+    private void applimmediately(String item, DataStack<String> arguments) {
+        if (isItemList(item)) {
+            throw new IllegalArgumentException("this Item :: " + item + " is not a list");
+        }
+        String result = item.replace("(", "").replace(")", "");
+        arguments.push(result);
     }
 
     private void delete(String find, DataStack<String> arguments) {
@@ -147,6 +158,14 @@ public class Controller {
             return arguments.get(converToNumber(find));
         }
         return null;
+    }
+
+    private boolean isItemList(String item) {
+        if (item.startsWith("(") && item.endsWith(")")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean isIntegerPositiv(String find) {
