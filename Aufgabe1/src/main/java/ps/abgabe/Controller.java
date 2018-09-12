@@ -16,7 +16,7 @@ public class Controller {
      */
     public static boolean isNumeric(String str) {
         try {
-            Integer value = Integer.parseInt(str);
+            Integer.parseInt(str);
         } catch (NumberFormatException nfe) {
             return false;
         }
@@ -139,6 +139,59 @@ public class Controller {
 
     }
 
+    /**
+     * s
+     * Pushes the number of stack entries onto the stack.
+     * @param arguments
+     */
+    public void sizeOfDataStack(DataStack<String> arguments) {
+        String size = arguments.size() + "";
+        arguments.push(size);
+
+    }
+
+    /** 
+     * l
+     * Checks if the top element on the data
+     * stack is a nonempty list (without removing an element) and
+     *  pushes a corresponding Boolean value (0 or 1) onto the stack.
+     * @param item
+     * @param arguments
+     */
+    public void isNonEmptyListCheck(String item, DataStack<String> arguments) {
+        applimmediately(item, arguments);
+        String s = arguments.pop();
+        if (s.isEmpty()) {
+            arguments.push("1");
+        } else {
+            arguments.push("0");
+        }
+    }
+
+    /**
+     * i ::  Checks if the top element on the data stack is
+     * an integer (without removing an element) and pushes a corresponding
+     * Boolean value (0 or 1) onto the stack
+     * @param item
+     * @param arguments
+     */
+    public void isInteger(String item, DataStack<String> arguments) {
+        try {
+            int value = Integer.parseInt(item);
+            if (Integer.valueOf(value) != null) {
+                arguments.push("1");
+            }
+        } catch (Exception e) {
+            arguments.push("0");
+        }
+
+    }
+
+    /**
+     *  a 
+     * @param item
+     * @param arguments
+     */
     private void applimmediately(String item, DataStack<String> arguments) {
         if (isItemList(item)) {
             throw new IllegalArgumentException("this Item :: " + item + " is not a list");
@@ -147,6 +200,11 @@ public class Controller {
         arguments.push(result);
     }
 
+    /**
+     *  d
+     * @param find
+     * @param arguments
+     */
     private void delete(String find, DataStack<String> arguments) {
         if (isIntegerPositiv(find)) {
             arguments.removeWithIndex(converToNumber(find));
