@@ -85,4 +85,12 @@ public class DataStack<E> {
 		return list.iterator();
 	}
 	
+    public E get(int index) {
+        return list.get(index);
+    }
+
+    public E removeWithIndex(int index) {
+        return list.remove(index);
+    }
+
 }
