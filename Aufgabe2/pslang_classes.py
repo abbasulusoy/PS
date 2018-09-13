@@ -311,7 +311,7 @@ class Executor:
     def execute_shell_instruction(self, instr):
         if instr.body.ret:
             instr.body.ret = subprocess.check_output(instr.body.instructions, shell=True).decode('ascii')
-            print(instr.body.ret)
         else:
             subprocess.check_output(instr.body.instructions, shell=True)
+        print(instr.body.ret)
 
