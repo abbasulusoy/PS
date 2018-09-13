@@ -1,4 +1,4 @@
-import os
+import subprocess
 import uuid
 
 class Rule:
@@ -78,7 +78,8 @@ class Parser:
         :param str_instruction:
         :return:
         '''
-        return str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
+        str = str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
+        return Variable(str, "OPEN", str)
 
     def first_alphabetical_substring(self, string):
         '''
@@ -309,8 +310,9 @@ class Executor:
         pass
 
     def execute_shell_instruction(self, instr):
-        if instr.body.ret: 
-            instr.body.ret = os.system(instr.body.instructions)
+        if instr.body.ret:
+            instr.body.ret = subprocess.check_output(instr.body.instructions, shell=True).decode('ascii')
+            print(instr.body.ret)
         else:
-            os.system(instr.body.instructions)
+            subprocess.check_output(instr.body.instructions, shell=True)
 
