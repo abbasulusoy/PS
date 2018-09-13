@@ -37,6 +37,7 @@ def run():
                 continue
             # found rule to execute
             if rule.is_shell:
+                executor.execute_shell_instruction(instr)
                 # TODO: execute shell command
                 pass
             else:

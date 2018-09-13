@@ -1,3 +1,6 @@
+import os
+import uuid
+
 class Rule:
     def __init__(self, is_shell, name, params, instructions, ret):
         self.is_shell = is_shell
@@ -19,11 +22,12 @@ class Body:
         self.ret = ret
 
 
-class Param:
-    def __init__(self, name, ptype):
+class Variable:
+    def __init__(self, name, vtype, value):
         self.name = name
-        self.ptype = ptype
-
+        self.vtype = vtype
+        self.id = uuid.uuid1()
+        self.value = value
 
 class Parser:
     def __init__(self):
@@ -226,7 +230,7 @@ class Parser:
         params_split = str_params.split(',')
         params = []
         for p in params_split:
-            par = Param(p, "")
+            par = Variable(p, "", "")
             if '*' in p or len(p.strip().split(' ')) > 1:
                 par.ptype = "OPEN"
             else:
@@ -303,3 +307,10 @@ class Matcher:
 class Executor:
     def __init__(self):
         pass
+
+    def execute_shell_instruction(self, instr):
+        if instr.body.ret: 
+            instr.body.ret = os.system(instr.body.instructions)
+        else:
+            os.system(instr.body.instructions)
+
