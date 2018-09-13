@@ -26,7 +26,6 @@ class Variable:
     def __init__(self, name, vtype, value):
         self.name = name
         self.vtype = vtype
-        self.id = uuid.uuid1()
         self.value = value
 
 class Parser:

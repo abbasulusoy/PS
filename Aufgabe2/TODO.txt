@@ -1,6 +1,6 @@
 Variable-Matching:
-	- Variablen-Liste befüllen
 	- Nachdem Rule und Parameter gematcht wurden muss Wert in Variable(value) eingesetzt werden
+	- Variablen-Liste befüllen (nach dem Instruction Matching) mit neuer Variablen-Instanz mit Namen (Rule-Name + Variablen-Name)
 	- Alle Vorkommnisse von Name werden durch Wert ersetzt (in der spezifischen Rule) auch in verschachtelten Methoden
 Ausführung:
 	- Neue Variablen in Variablen-Liste aufnehmen
@@ -11,3 +11,5 @@ Ausführung:
 Return-Werte:
 	- Nach Ausführung return-Wert in die Variablen-Liste einfügen
 	- Mit Stack-Pointer überprüfen welche Methode den return-Wert bekommt
+	- Aufrufende Methode bekommt return-wert zugewiesen
+	- Aufgerufene Methode wird aus stack-pointer gelöscht und Variablen werden freigegeben
