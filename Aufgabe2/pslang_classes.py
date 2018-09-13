@@ -1,5 +1,5 @@
 import subprocess
-import uuid
+
 
 class Rule:
     def __init__(self, is_shell, name, params, instructions, ret):
@@ -27,6 +27,7 @@ class Variable:
         self.name = name
         self.vtype = vtype
         self.value = value
+
 
 class Parser:
     def __init__(self):
@@ -230,6 +231,7 @@ class Parser:
         params_split = str_params.split(',')
         params = []
         for p in params_split:
+            print(p)
             par = Variable(p, "", "")
             if '*' in p or len(p.strip().split(' ')) > 1:
                 par.ptype = "OPEN"
@@ -309,9 +311,8 @@ class Executor:
         pass
 
     def execute_shell_instruction(self, instr):
+        output = subprocess.check_output(instr.body.instructions, shell=True).decode('ascii')
         if instr.body.ret:
-            instr.body.ret = subprocess.check_output(instr.body.instructions, shell=True).decode('ascii')
-        else:
-            subprocess.check_output(instr.body.instructions, shell=True)
-        print(instr.body.ret)
+            instr.body.ret = output
+        print(output)
 

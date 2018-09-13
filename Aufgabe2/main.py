@@ -4,7 +4,6 @@ import sys
 
 
 def run():
-    # TODO: implement
     '''
     PARSING STARTS HERE
 
@@ -25,6 +24,17 @@ def run():
     rules = parser.parse_rules(str_program)
     initial_instructions = parser.parse_instructions(str_initial_instructions)
 
+    '''
+    format:
+    variables = [
+        rulename:paramname = "paramvalue",
+        rulename:paramname = "paramvalue",
+        ...
+    ] 
+    '''
+    variables = []
+
+    stack_pointer = Stack()
     exec_queue = Queue()
     for i in initial_instructions:
         # put all initial instructions into the queue
@@ -36,10 +46,15 @@ def run():
                 # if instruction and rule does not match, ignore
                 continue
             # found rule to execute
+            for rparam,iparam in zip(rule.body.params, instr.body.params):
+                rparam.value = iparam.name
+                entry = {
+                    str(rule.name + ":" + rparam.name): rparam.value
+                }
+                variables.append(entry)
+
             if rule.is_shell:
                 executor.execute_shell_instruction(rule)
-                # TODO: execute shell command
-                pass
             else:
                 # put all instructions into the queue
                 for i in rule.body.instructions:
