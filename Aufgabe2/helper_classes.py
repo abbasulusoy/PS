@@ -1,3 +1,6 @@
+import json
+
+
 class Queue:
     def __init__(self):
         self.items = []
@@ -33,3 +36,9 @@ class Stack:
 
     def size(self):
         return len(self.items)
+
+    def to_string(self):
+        result = ""
+        for i in self.items:
+            result += json.dumps(str(i)) + "\n"
+        return result

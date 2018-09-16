@@ -27,29 +27,44 @@ def run():
     '''
     format:
     variables = [
-        rulename:paramname = "paramvalue",
-        rulename:paramname = "paramvalue",
+        {UUID: [value | UUID]},
+        {UUID: [value | UUID]},
         ...
     ] 
     '''
     variables = []
 
-    stack_pointer = Stack()
+
+    #format:
+    #stack_pointer = [
+    #    {from: rule_id, to: rule_id},
+    #    {from: rule_id, to: rule_id},
+    #    ...
+    #]
+    #stack_pointer = Stack()
+
     exec_queue = Queue()
     for i in initial_instructions:
         # put all initial instructions into the queue
         exec_queue.enqueue(i)
+        # put all parameters into the variables list
+        for p in i.body.params:
+            variables.append({p.var_id: p.value})
+
     while not exec_queue.is_empty():
         instr = exec_queue.dequeue()
         for rule in rules:
             if not Matcher.match_instruction_rule(instr, rule):
                 # if instruction and rule does not match, ignore
                 continue
+
             # found rule to execute
+
+            # set param values
             for rparam,iparam in zip(rule.body.params, instr.body.params):
                 rparam.value = iparam.name
                 entry = {
-                    str(rule.name + ":" + rparam.name): rparam.value
+                    rparam.var_id: rparam.value
                 }
                 variables.append(entry)
 
@@ -58,7 +73,9 @@ def run():
             else:
                 # put all instructions into the queue
                 for i in rule.body.instructions:
+                    #stack_pointer.push({"from": instr.instr_id, "to": i.instr_id})
                     exec_queue.enqueue(i)
+
 
 
 if __name__ == "__main__":

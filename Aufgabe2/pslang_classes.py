@@ -1,8 +1,9 @@
-import subprocess
+import subprocess, uuid
 
 
 class Rule:
     def __init__(self, is_shell, name, params, instructions, ret):
+        self.rule_id = str(uuid.uuid1())
         self.is_shell = is_shell
         self.name = name
         self.body = Body(params, instructions, ret)
@@ -10,6 +11,7 @@ class Rule:
 
 class Instruction:
     def __init__(self, is_shell, name, params, ret):
+        self.instr_id = str(uuid.uuid1())
         self.is_shell = is_shell
         self.name = name
         self.body = Body(params, None, ret)
@@ -24,6 +26,7 @@ class Body:
 
 class Variable:
     def __init__(self, name, vtype, value):
+        self.var_id = str(uuid.uuid1())
         self.name = name
         self.vtype = vtype
         self.value = value
@@ -231,8 +234,11 @@ class Parser:
         params_split = str_params.split(',')
         params = []
         for p in params_split:
-            print(p)
-            par = Variable(p, "", "")
+            if len(p) == 0:
+                # .split(',') on an empty string will return ['']
+                # which should be ignored
+                continue
+            par = Variable(p, "", p)
             if '*' in p or len(p.strip().split(' ')) > 1:
                 par.ptype = "OPEN"
             else:
