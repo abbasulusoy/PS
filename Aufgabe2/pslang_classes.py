@@ -239,7 +239,9 @@ class Parser:
                 # which should be ignored
                 continue
             par = Variable(p, "", p)
-            if '*' in p or len(p.strip().split(' ')) > 1:
+            if '*' in p and '+' in p:
+                par.ptype = "OPEN+"
+            elif '*' in p or len(p.strip().split(' ')) > 1:
                 par.ptype = "OPEN"
             else:
                 par.ptype = "CLOSED"
