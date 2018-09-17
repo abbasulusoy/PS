@@ -63,31 +63,31 @@ public class Controller {
      *
      * @param token
      *            - the operator
-     * @param arguments
+     * @param dataStack
      *            - list of arguments for the operator
      * @return a result for a operator token
      */
-    public Integer evaluateOperator(String token, DataStack<Integer> arguments) {
+    public Integer evaluateOperator(String token, DataStack<Integer> dataStack) {
         Integer result = null;
 
         switch (token) {
             case "+":
-                result = add(arguments.pop(), arguments.pop());
+                result = add(dataStack.pop(), dataStack.pop());
                 break;
             case "-":
-                result = subtract(arguments.pop(), arguments.pop());
+                result = subtract(dataStack.pop(), dataStack.pop());
                 break;
             case "*":
-                result = multiply(arguments.pop(), arguments.pop());
+                result = multiply(dataStack.pop(), dataStack.pop());
                 break;
             case "/":
-                result = divide(arguments.pop(), arguments.pop());
+                result = divide(dataStack.pop(), dataStack.pop());
                 break;
             case "^":
-                result = pow(arguments.pop(), arguments.pop());
+                result = pow(dataStack.pop(), dataStack.pop());
                 break;
             case "!":
-                Integer temp = factorial(arguments.pop());
+                Integer temp = factorial(dataStack.pop());
                 if (temp != null) {
                     result = temp.intValue();
                 } else {
@@ -95,13 +95,13 @@ public class Controller {
                 }
                 break;
             case "<":
-                result = smaller(arguments.pop(), arguments.pop());
+                result = smaller(dataStack.pop(), dataStack.pop());
                 break;
             case ">":
-                result = greater(arguments.pop(), arguments.pop());
+                result = greater(dataStack.pop(), dataStack.pop());
                 break;
             case "%":
-                result = restOfDivision(arguments.pop(), arguments.pop());
+                result = restOfDivision(dataStack.pop(), dataStack.pop());
                 break;
             default:
                 result = 0;
@@ -116,27 +116,105 @@ public class Controller {
      *
      * @param token
      *            - the operator
-     * @param arguments
+     * @param datastack
      *            - list of arguments for the operator
      */
-    public void evaluateUnaryOperator(String token, DataStack<String> arguments) {
+    public void evaluateUnaryOperator(String token, DataStack<String> datastack) {
         switch (token) {
             case "~":
-                negation(arguments.pop(), arguments);
+                negation(datastack.pop(), datastack);
                 break;
             case "c":
-                copy(arguments.pop(), arguments);
+                copy(datastack.pop(), datastack);
                 break;
             case "d":
-                delete(arguments.pop(), arguments);
+                delete(datastack.pop(), datastack);
                 break;
             case "a":
-                applimmediately(arguments.pop(), arguments);
+                applimmediately(datastack.pop(), datastack);
+            case "i":
+                isInteger(datastack.pop(), datastack);
+                break;
+            case "s":
+                sizeOfDataStack(datastack);
+                break;
+            case "l":
+                isNonEmptyListCheck(datastack.pop(), datastack);
+                break;
+            case "r":
+                writeRegister(datastack.pop(), datastack);
+                break;
+            case "w":
+                readRegister(datastack.pop(), datastack);
+                break;
+            case ":":
+                combine(datastack.pop(), datastack);
+                break;
+            case "!":
+                divideList(datastack.pop(), datastack);
+                break;
+            case "x":
+                exit();
                 break;
             default:
                 break;
         }
 
+    }
+
+    /**
+     * takes the top element n and the second element
+     * x from the data stack and writes x to register n. An error is
+     * reported if n is not an integer between 0 and 31
+     * @param pop
+     * @param arguments
+     */
+    private void writeRegister(String pop, DataStack<String> arguments) {
+
+    }
+
+    /**
+     * takes the top element n from the data stack and
+     * pushes the contents of register n onto the data stack. An error
+     * is reported if n is not an integer between 0 and 31.
+     * @param pop
+     * @param arguments
+     */
+    private void readRegister(String pop, DataStack<String> arguments) {}
+
+    /**
+     * Takes the top element h and the second element t
+     * (which is a list) from the data stack, creates a new list by
+     * adding h as new head element to t, and pushes the new list
+     * onto the data stack. An error is reported if t is not a list
+     * @param pop
+     * @param arguments
+     */
+    private void combine(String pop, DataStack<String> arguments) {}
+
+    /**
+     * takes an argument (which is a nonempty list) from
+     * the data stack and pushes first the tail of this list and then
+     * the list head onto the data stack
+     * @param pop
+     * @param arguments
+     */
+    private void divideList(String pop, DataStack<String> arguments) {
+        if (!isNonEmptyListCheck(pop, arguments)) {
+            throw new IllegalArgumentException("An error is reported that the argument is not a nonempty list");
+        }
+
+        String nextElement = arguments.pop();
+        if (isItemList(nextElement)) {
+            throw new IllegalArgumentException("An error is reported that the next element is not a list");
+        }
+        nextElement.substring(0);
+        nextElement = "(" + pop + nextElement;
+        arguments.push(nextElement);
+    }
+
+    private void exit() {
+        System.exit(0);
     }
 
     /**
@@ -158,13 +236,15 @@ public class Controller {
      * @param item
      * @param arguments
      */
-    public void isNonEmptyListCheck(String item, DataStack<String> arguments) {
+    public boolean isNonEmptyListCheck(String item, DataStack<String> arguments) {
         applimmediately(item, arguments);
         String s = arguments.pop();
         if (s.isEmpty()) {
             arguments.push("1");
+            return true;
         } else {
             arguments.push("0");
+            return false;
         }
     }
 
@@ -188,12 +268,34 @@ public class Controller {
     }
 
     /**
+     * z
+     * An argument (which is a list) is taken from the
+     * data stack, and the list contents (without parentheses) are inserted
+     * at the end of the command stream to be executed after
+     * everything else currently being in the command stream. An
+     * error is reported if the argument is no list 
+     * @param item
+     * @param arguments
+     */
+    private void applyLater(String item, DataStack<String> arguments) {
+        if (!isItemList(item)) {
+            throw new IllegalArgumentException("this Item :: " + item + " is not a list");
+        }
+        String result = item.replace("(", "").replace(")", "");
+        arguments.addLast(result);
+    }
+
+    /**
+     * An argument (which is a list) is taken
+     * from the data stack, and the list contents (without parentheses)
+     * are inserted at the begin of the command stream to be
+     * executed next. An error is reported if the argument is no list
      *  a 
      * @param item
      * @param arguments
      */
     private void applimmediately(String item, DataStack<String> arguments) {
-        if (isItemList(item)) {
+        if (!isItemList(item)) {
             throw new IllegalArgumentException("this Item :: " + item + " is not a list");
         }
         String result = item.replace("(", "").replace(")", "");
@@ -202,6 +304,10 @@ public class Controller {
 
     /**
      *  d
+     * An argument (which is a list) is taken
+     * from the data stack, and the list contents (without parentheses)
+     * are inserted at the begin of the command stream to be
+     * executed next. An error is reported if the argument is no list 
      * @param find
      * @param arguments
      */
@@ -211,6 +317,15 @@ public class Controller {
         }
     }
 
+    /**
+     * c
+     * replaces the top element n on the data stack with a copy
+     * of the nth element on the data stack (counted from the top of
+     * the stack). An error is reported if n is not a positive number.
+     * @param find
+     * @param arguments
+     * @return copy function c please see assignment one 
+     */
     private String copy(String find, DataStack<String> arguments) {
         if (isIntegerPositiv(find)) {
             return arguments.get(converToNumber(find));
@@ -218,6 +333,11 @@ public class Controller {
         return null;
     }
 
+    /**
+     * 
+     * @param item
+     * @return  check,  is item a list 
+     */
     private boolean isItemList(String item) {
         if (item.startsWith("(") && item.endsWith(")")) {
             return true;
@@ -226,12 +346,16 @@ public class Controller {
         }
     }
 
-    private boolean isIntegerPositiv(String find) {
-        if (!isInteger(find)) {
-            String message = "error ::" + find + " a not number.";
+    /**
+     * @param input
+     * @return Checks if the top element on the data stack is an integer
+     */
+    private boolean isIntegerPositiv(String input) {
+        if (!isInteger(input)) {
+            String message = "error ::" + input + " a not number.";
             throw new IllegalArgumentException(message);
         } else {
-            int number = converToNumber(find);
+            int number = converToNumber(input);
             if (number < 0) {
                 String message = "error ::" + number + " a positive number.";
                 throw new IllegalArgumentException(message);
@@ -432,11 +556,11 @@ public class Controller {
     }
 
     /**
-     * @param s
+     * @param input
      * @return true or false
      */
-    private boolean isApplyImmediately(String s) {
-        if (s.equals("a")) {
+    private boolean isApplyImmediately(String input) {
+        if (input.equals("a")) {
             return true;
         } else {
             return false;
@@ -444,43 +568,11 @@ public class Controller {
     }
 
     /**
-     * @param s
+     * @param input
      * @return true or false
      */
-    private boolean isApplyLater(String s) {
-        if (s.equals("z")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean isReadRegister(String s) {
-        if (s.equals("r")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean isWriteRegister(String s) {
-        if (s.equals("w")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean isInteger(String s) {
-        if (s.equals("i")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean isNoEmptyListCheck(String s) {
-        if (s.equals("l")) {
+    private boolean isApplyLater(String input) {
+        if (input.equals("z")) {
             return true;
         } else {
             return false;
@@ -488,17 +580,69 @@ public class Controller {
     }
 
     /**
-     * @param s if s than get the stack key
-     * @return true or false
+     * @param input
+     * @return read register 
      */
-    public boolean isStackSize(String s) {
-        if (s.equals("s")) {
+    private boolean isReadRegister(String input) {
+        if (input.equals("r")) {
             return true;
         } else {
             return false;
         }
     }
 
+    /**
+     * @param input
+     * @return function for write register 
+     */
+    private boolean isWriteRegister(String input) {
+        if (input.equals("w")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param input
+     * @return is integer function
+     */
+    private boolean isInteger(String input) {
+        if (input.equals("i")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param input
+     * @return is non empty list check
+     */
+    private boolean isNoEmptyListCheck(String input) {
+        if (input.equals("l")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param input if s than get the stack key
+     * @return true or false
+     */
+    public boolean isStackSize(String input) {
+        if (input.equals("s")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param token
+     * @return ask if function sqrt and so on 
+     */
     public static boolean isFunction(String token) {
         if (token.equals("sqrt")) {
             return true;
@@ -620,4 +764,24 @@ public class Controller {
         return output;
     }
 
+    /**
+     * A function to print all prime factors 
+     * @param number
+     */
+    public static void primeFactors(int number) {
+        // Print the number of 2s that divide n 
+        while (number % 2 == 0) {
+            number /= 2;
+        }
+        for (int i = 3; i <= Math.sqrt(number); i += 2) {
+            // While i divides n, print i and divide n 
+            while (number % i == 0) {
+                System.out.print(i + " ");
+                number /= i;
+            }
+        }
+
+        if (number > 2)
+            System.out.print(number);
+    }
 }
