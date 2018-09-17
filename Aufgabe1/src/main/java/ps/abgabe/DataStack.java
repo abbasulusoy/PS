@@ -93,4 +93,9 @@ public class DataStack<E> {
         return list.remove(index);
     }
 
+    public E addLast(E e) {
+        list.addLast(e);
+        return list.getLast();
+    }
+
 }
