@@ -316,9 +316,10 @@ class Executor:
     def __init__(self):
         pass
 
-    def execute_shell_instruction(self, instr):
-        output = subprocess.check_output(instr.body.instructions, shell=True).decode('ascii')
-        if instr.body.ret:
-            instr.body.ret = output
+    def execute_shell_instruction(self, rule):
+        # TODO: alle parameter in shell command ersetzen und dann ausführen
+        output = subprocess.check_output(rule.body.instructions, shell=True).decode('ascii')
+        if rule.body.ret:
+            rule.body.ret = output
         print(output)
 
