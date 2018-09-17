@@ -34,7 +34,6 @@ def run():
     '''
     variables = []
 
-
     #format:
     #stack_pointer = [
     #    {from: rule_id, to: rule_id},
