@@ -1,5 +1,9 @@
+import subprocess, uuid
+
+
 class Rule:
     def __init__(self, is_shell, name, params, instructions, ret):
+        self.rule_id = str(uuid.uuid1())
         self.is_shell = is_shell
         self.name = name
         self.body = Body(params, instructions, ret)
@@ -7,6 +11,7 @@ class Rule:
 
 class Instruction:
     def __init__(self, is_shell, name, params, ret):
+        self.instr_id = str(uuid.uuid1())
         self.is_shell = is_shell
         self.name = name
         self.body = Body(params, None, ret)
@@ -19,10 +24,12 @@ class Body:
         self.ret = ret
 
 
-class Param:
-    def __init__(self, name, ptype):
+class Variable:
+    def __init__(self, name, vtype, value):
+        self.var_id = str(uuid.uuid1())
         self.name = name
-        self.ptype = ptype
+        self.vtype = vtype
+        self.value = value
 
 
 class Parser:
@@ -74,7 +81,8 @@ class Parser:
         :param str_instruction:
         :return:
         '''
-        return str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
+        str = str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
+        return Variable(str, "OPEN", str)
 
     def first_alphabetical_substring(self, string):
         '''
@@ -226,7 +234,11 @@ class Parser:
         params_split = str_params.split(',')
         params = []
         for p in params_split:
-            par = Param(p, "")
+            if len(p) == 0:
+                # .split(',') on an empty string will return ['']
+                # which should be ignored
+                continue
+            par = Variable(p, "", p)
             if '*' in p or len(p.strip().split(' ')) > 1:
                 par.ptype = "OPEN"
             else:
@@ -303,3 +315,10 @@ class Matcher:
 class Executor:
     def __init__(self):
         pass
+
+    def execute_shell_instruction(self, instr):
+        output = subprocess.check_output(instr.body.instructions, shell=True).decode('ascii')
+        if instr.body.ret:
+            instr.body.ret = output
+        print(output)
+
