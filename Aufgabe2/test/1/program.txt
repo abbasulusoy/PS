@@ -1,0 +1,6 @@
+main:(*names)(sayHello(*names)(*greetings);putDot(*greetings)(*dotted);)().
+sayHello:(+name*names)(sayHello(+name)(+greeting);sayHello(*names)(*greetings);)(+greeting*greetings).
+sayHello:(+name)($concat(Hello ,+name)(+greeting);)(+greeting).
+putDot:(+greeting*greetings)(putDot(+greeting)(+dotted);putDot(*greetings)(*dotteds);)(+dotted*dotteds).
+putDot:(+greeting)($concat(+greeting,\.)(+dotted);)(+dotted).
+$concat:(+s1,+s2)(s1=+s1;s2=+s2;ret=$s1$s2;echo $ret;)(s3).
