@@ -34,15 +34,6 @@ def run():
     '''
     variables = []
 
-
-    #format:
-    #stack_pointer = [
-    #    {from: rule_id, to: rule_id},
-    #    {from: rule_id, to: rule_id},
-    #    ...
-    #]
-    #stack_pointer = Stack()
-
     exec_queue = Queue()
     for i in initial_instructions:
         # put all initial instructions into the queue
@@ -68,12 +59,17 @@ def run():
                 }
                 variables.append(entry)
 
+            # TODO: 1.3 + rekursive variablen werte finden und ersetzen und Eintrag in variables bearbeiten
+
             if rule.is_shell:
                 executor.execute_shell_instruction(rule)
+                # TODO: return wert in variable-liste ersetzen
+                # if rule.body.ret != EMPTY_STRING:
+                #   add value to list
             else:
                 # put all instructions into the queue
                 for i in rule.body.instructions:
-                    #stack_pointer.push({"from": instr.instr_id, "to": i.instr_id})
+                    # TODO: 2.1 Parameter und return Variablen in variables-liste schreiben
                     exec_queue.enqueue(i)
 
 
