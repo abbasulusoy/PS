@@ -14,7 +14,6 @@ public class StackCalculator {
 
 	/**
 	 * Evaluates the expression
-	 *
 	 * @param expr
 	 *            - input linked list, each operator/number is stored in the
 	 *            list as an element

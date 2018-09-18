@@ -40,9 +40,10 @@ public class DataStack<E> {
 	}
 	
 	/**
-	 * Pops an object off the top of the stack
-	 * @return popped object
-	 */
+     * 
+     * Pops an object off the top of the stack
+     * @return popped object
+     */
 	public E pop() {
 		if(isEmpty())
 			throw new EmptyStackException();
