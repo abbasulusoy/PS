@@ -193,6 +193,7 @@ public class Calculator {
         if (getIntValue(pop) > 0 && getIntValue(pop) < 31) {
             register.add(getIntValue(pop), last);
         } else {
+
             throw new IllegalArgumentException("An error is reported if n is not an integer between 0 and 31.");
         }
     }
