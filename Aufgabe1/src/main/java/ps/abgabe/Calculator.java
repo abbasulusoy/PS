@@ -184,7 +184,6 @@ public class Calculator {
 
     /**
      * takes the top element n and the second element
-     * 
      * x from the data stack and writes x to register n. An error is
      * reported if n is not an integer between 0 and 31
      * @param pop

@@ -13,12 +13,11 @@ public class StackCalculator {
     Calculator calculator = new Calculator();
 
 	/**
-	 * Evaluates the expression
-	 * @param expr
-	 *            - input linked list, each operator/number is stored in the
-	 *            list as an element
-	 * @return string - result as a string
-	 */
+     * Evaluates the expression
+     * @param expr input linked list, each operator/number is stored in the
+     *            list as an element
+     * @return string - result as a string
+     */
 	public String evaluate(String expr) {
         String[] exprArray = null;
         DataStack<String> inputs = new DataStack<>();

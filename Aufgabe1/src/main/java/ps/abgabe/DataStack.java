@@ -93,6 +93,7 @@ public class DataStack<E> {
 	}
 	
     /**
+     * 
      * @param index
      * @return E
      */

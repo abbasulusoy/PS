@@ -14,7 +14,6 @@ public class CalculatorTest{
 		System.out.println("Welcome the to stack based calculator");
 		for(;;) {
 		System.out.println("Enter an expression:");
-
 		String expr=sc.nextLine();
 		String val=calculator.evaluate(expr);
             System.out.println("result ::: " + val);
