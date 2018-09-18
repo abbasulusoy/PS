@@ -1,21 +1,16 @@
 package ps.abgabe;
 
+import java.util.Iterator;
+
 /**
  * @author Abbas ULUSOY 
  * fill stacks with operators and values 
  *
  */
 public class StackCalculator {
-    DataStack<String> stack = new DataStack<String>();
     DataStack<String> outputs = new DataStack<String>();
     DataStack<String> inputs = new DataStack<String>();
-
-	/**
-	 * @return result
-	 */
-	public int calculate() {
-		return 0;
-	}
+    Calculator calculator = new Calculator();
 
 	/**
 	 * Evaluates the expression
@@ -26,67 +21,33 @@ public class StackCalculator {
 	 * @return string - result as a string
 	 */
 	public String evaluate(String expr) {
-        String[] exprArray = expr.split("");
-        DataStack<Integer> inputs = new DataStack<Integer>();
-        DataStack<String> operators = new DataStack<String>();
-        DataStack<String> inputsForOutputsToParse = new DataStack<>();
+        String[] exprArray = null;
+        DataStack<String> inputs = new DataStack<>();
+        DataStack<String> output = new DataStack<>();
 
-		for (String item : exprArray) {
-            inputsForOutputsToParse.push(item);
+        inputs.push("0");
+        if (expr.contains("(") || expr.contains(")")) {
+            exprArray = expr.split("\\)");
+            for (String s : exprArray) {
+                if (s.contains("(")) {
+                    s = s + ")";
+                }
+                inputs.push(s);
+            }
+        }
 
-			if (!Controller.isNumeric(item)) {
-				for (String nextItem : item.split("")) {
-					fillStacks(inputs, operators, nextItem);
-				}
-			} else {
-				fillStacks(inputs, operators, item);
-			}
-		}
-        outputs = new Controller().parse(inputsForOutputsToParse);
+        Iterator<String> iter = inputs.iterator();
+        while (iter.hasNext()) {
+            String token = inputs.pop();
+            if (calculator.isUnaryOperator(token)) {
+                calculator.evaluateUnaryOperator(token, inputs);
+            } else {
+                calculator.evaluateOperator(token, inputs);
+            }
+        }
 
-		Controller c = new Controller();
-		Integer result = null;
-		Integer index = operators.size();
-        DataStack<String> reverseOperators = new DataStack<String>();
-		for (Integer i = 0; i < index; i++) {
-			reverseOperators.push(operators.pop());
-		}
-
-		index = reverseOperators.size();
-		for (Integer i = 0; i < index; i++) {
-			String token = reverseOperators.pop();
-			if(token.contains("x")) {
-                System.out.println("X is selected Calculation has been closed");
-                System.exit(0);
-                break;
-			}
-			result = c.evaluateOperator(token, inputs);
-			fillResultSecondPlace(inputs, result);
-
-		}
-		if (result == null) {
-			return "ERROR";
-		}
-
-		return result.toString();
+        return exprArray[0] + " " + exprArray[1] + " " + exprArray[2];
 	}
 
-	private void fillResultSecondPlace(DataStack<Integer> inputs, Integer result) {
-		if (!inputs.isEmpty()) {
-			Integer next = inputs.pop();
-			inputs.push(result);
-			inputs.push(next);
-		}
-	}
-
-	private void fillStacks(DataStack<Integer> inputs, DataStack<String> operators, String item) {
-		if (Controller.isNumeric(item)) {
-			inputs.push(Controller.converToNumber(item));
-		} else {
-			if (Controller.isBinaryOperator(item)) {
-				operators.push(item);
-			}
-		}
-	}
 
 }

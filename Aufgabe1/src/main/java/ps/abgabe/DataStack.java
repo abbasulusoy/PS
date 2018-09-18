@@ -77,28 +77,49 @@ public class DataStack<E> {
 		return list.remove();
 	}
 
+    /**
+     * @return E 
+     */
 	public E removeFirst() {
 		return list.removeFirst();
 	}
 	
+    /**
+     * @return E 
+     */
 	public Iterator<E> iterator() {
 		return list.iterator();
 	}
 	
+    /**
+     * @param index
+     * @return E
+     */
     public E get(int index) {
         return list.get(index);
     }
 
+    /**
+     * @param index
+     * @return E object
+     */
     public E removeWithIndex(int index) {
         return list.remove(index);
     }
 
     /**
-     * @param e
-     * @return
+     * @param e object 
+     * @return E
      */
     public E addLast(E e) {
         list.addLast(e);
+        return list.getLast();
+    }
+
+    /**
+     * @return get last element from stack
+     */
+    public E getLast() {
         return list.getLast();
     }
 

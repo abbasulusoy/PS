@@ -7,7 +7,7 @@ import java.util.Scanner;
  * @author Abbas ULUSOY
  *
  */
-public class SampleTest{
+public class CalculatorTest{
 	public static void main(String[] args) {
 		StackCalculator calculator = new StackCalculator();
 		Scanner sc = new Scanner(System.in);

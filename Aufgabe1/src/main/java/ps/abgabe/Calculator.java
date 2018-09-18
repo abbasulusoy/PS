@@ -1,7 +1,23 @@
 package ps.abgabe;
 
-public class Controller {
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * @author Abbas ULUSOY
+ *
+ */
+public class Calculator {
+
+    List<String> register = null;
+
+    /**
+     *  Constructor
+     */
+    public Calculator() {
+        register = new ArrayList<>(32);
+        register.add("0");
+    }
     /**
      * @param value
      * @return get int value parse string to int
@@ -48,10 +64,10 @@ public class Controller {
         return false;
     }
 
-    public static boolean isOperator(String str) {
-        if (str.equals("+") || str.equals("-") || str.equals("*") || str.equals("/") || str.equals("%")
-                || str.equals("!") || str.equals("&") || str.equals("|") || str.equals("=") || str.equals("<")
-                || str.equals(">")) {
+    public static boolean isOperator(String token) {
+        if (token.equals("+") || token.equals("-") || token.equals("*") || token.equals("/") || token.equals("%")
+                || token.equals("!") || token.equals("&") || token.equals("|") || token.equals("=") || token.equals("<")
+                || token.equals(">")) {
             return true;
         }
         return false;
@@ -67,27 +83,27 @@ public class Controller {
      *            - list of arguments for the operator
      * @return a result for a operator token
      */
-    public Integer evaluateOperator(String token, DataStack<Integer> dataStack) {
+    public Integer evaluateOperator(String token, DataStack<String> dataStack) {
         Integer result = null;
 
         switch (token) {
             case "+":
-                result = add(dataStack.pop(), dataStack.pop());
+                result = add(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             case "-":
-                result = subtract(dataStack.pop(), dataStack.pop());
+                result = subtract(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             case "*":
-                result = multiply(dataStack.pop(), dataStack.pop());
+                result = multiply(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             case "/":
-                result = divide(dataStack.pop(), dataStack.pop());
+                result = divide(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             case "^":
-                result = pow(dataStack.pop(), dataStack.pop());
+                result = pow(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             case "!":
-                Integer temp = factorial(dataStack.pop());
+                Integer temp = factorial(getIntValue(dataStack.pop()));
                 if (temp != null) {
                     result = temp.intValue();
                 } else {
@@ -95,13 +111,13 @@ public class Controller {
                 }
                 break;
             case "<":
-                result = smaller(dataStack.pop(), dataStack.pop());
+                result = smaller(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             case ">":
-                result = greater(dataStack.pop(), dataStack.pop());
+                result = greater(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             case "%":
-                result = restOfDivision(dataStack.pop(), dataStack.pop());
+                result = restOfDivision(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
             default:
                 result = 0;
@@ -132,6 +148,7 @@ public class Controller {
                 break;
             case "a":
                 applimmediately(datastack.pop(), datastack);
+                break;
             case "i":
                 isInteger(datastack.pop(), datastack);
                 break;
@@ -142,16 +159,19 @@ public class Controller {
                 isNonEmptyListCheck(datastack.pop(), datastack);
                 break;
             case "r":
-                writeRegister(datastack.pop(), datastack);
-                break;
-            case "w":
                 readRegister(datastack.pop(), datastack);
                 break;
+            case "w":
+                writeRegister(datastack.pop(), datastack.getLast());
+                break;
             case ":":
-                combine(datastack.pop(), datastack);
+                combine(datastack.pop(), datastack.getLast(), datastack);
                 break;
             case "!":
                 divideList(datastack.pop(), datastack);
+                break;
+            case "z":
+                applyLater(datastack.pop(), datastack);
                 break;
             case "x":
                 exit();
@@ -169,8 +189,12 @@ public class Controller {
      * @param pop
      * @param arguments
      */
-    private void writeRegister(String pop, DataStack<String> arguments) {
-
+    private void writeRegister(String pop, String last) {
+        if (getIntValue(pop) > 0 && getIntValue(pop) < 31) {
+            register.add(getIntValue(pop), last);
+        } else {
+            throw new IllegalArgumentException("An error is reported if n is not an integer between 0 and 31.");
+        }
     }
 
     /**
@@ -180,17 +204,30 @@ public class Controller {
      * @param pop
      * @param arguments
      */
-    private void readRegister(String pop, DataStack<String> arguments) {}
+    private void readRegister(String pop, DataStack<String> arguments) {
+        if (getIntValue(pop) > 0 && getIntValue(pop) < 31) {
+            arguments.push(register.get(getIntValue(pop)));
+        } else {
+            throw new IllegalArgumentException("An error is reported if n is not an integer between 0 and 31.");
+        }
+    }
 
     /**
      * Takes the top element h and the second element t
      * (which is a list) from the data stack, creates a new list by
      * adding h as new head element to t, and pushes the new list
      * onto the data stack. An error is reported if t is not a list
-     * @param pop
+     * @param firstElement
+     * @param lastElement
      * @param arguments
      */
-    private void combine(String pop, DataStack<String> arguments) {}
+    private void combine(String firstElement, String lastElement, DataStack<String> arguments) {
+        if (isItemList(lastElement)) {
+            throw new IllegalArgumentException("An error is reported that the next element is not a list");
+        } else {
+            arguments.push("(" + firstElement + lastElement + ")");
+        }
+    }
 
     /**
      * takes an argument (which is a nonempty list) from
@@ -213,6 +250,9 @@ public class Controller {
         arguments.push(nextElement);
     }
 
+    /**
+     * exit calculator and programm
+     */
     private void exit() {
         System.exit(0);
     }
@@ -235,6 +275,7 @@ public class Controller {
      *  pushes a corresponding Boolean value (0 or 1) onto the stack.
      * @param item
      * @param arguments
+     * @return if non empty list  
      */
     public boolean isNonEmptyListCheck(String item, DataStack<String> arguments) {
         applimmediately(item, arguments);
@@ -673,95 +714,6 @@ public class Controller {
             return true;
         }
         return false;
-    }
-
-    public static int getPrecedence(String token) {
-        switch (token) {
-            case "+":
-                return 2;
-            case "-":
-                return 2;
-            case "*":
-                return 3;
-            case "/":
-                return 3;
-            case "%":
-                return 3;
-            case "^":
-                return 4;
-            case "!":
-                return 5;
-            default:
-                return 1;
-        }
-    }
-
-    /**
-     * Parses the expression
-     * 
-     * @param input2
-     *            - input expression as a list
-     * @return output list
-     */
-    public DataStack<String> parse(DataStack<String> input2) {
-        DataStack<String> output = new DataStack();
-        DataStack<String> functionsstack = new DataStack();
-        DataStack<String> input = input2;
-
-        while (!input.isEmpty()) {
-            String token = input.remove();
-
-            if (isNumeric(token)) {
-                output.push(token);
-            } else if (isFunction(token)) {
-                functionsstack.push(token);
-            } else if (isFunctionSeparator(token)) {
-                while (!functionsstack.isEmpty() && !functionsstack.peek().equals("(")) {
-                    output.push(functionsstack.pop());
-                }
-                if (functionsstack.peek().equals("(")) {
-
-                } else {
-                    System.out.println("The separator or parentheses were misplaced.");
-                    return null;
-                }
-            } else if (isOperator(token)) {
-                while (!functionsstack.isEmpty() && isOperator(functionsstack.peek())
-                        && ((isBinaryOperator(token) && (getPrecedence(token) <= getPrecedence(functionsstack.peek()))
-                                || (isBinaryOperator(token)
-                                        && (getPrecedence(token) < getPrecedence(functionsstack.peek())))))) {
-                    output.push(functionsstack.pop());
-                }
-                functionsstack.push(token);
-            } else if (token.equals("(")) {
-                functionsstack.push(token);
-            } else if (token.equals(")")) {
-                while (!functionsstack.isEmpty() && !functionsstack.peek().equals("(")) {
-                    output.push(functionsstack.pop());
-                }
-                if (functionsstack.peek().equals("(")) {
-                    functionsstack.pop();
-                    if (!functionsstack.isEmpty() && isFunction(functionsstack.peek())) {
-                        output.push(functionsstack.pop());
-                    }
-                } else {
-                    System.err.println("There are mismatched parentheses.");
-                    return null;
-                }
-
-            }
-        }
-
-        if (input.isEmpty()) {
-            while (!functionsstack.isEmpty()) {
-                if (functionsstack.peek().equals("(") || functionsstack.peek().equals(")")) {
-                    System.err.println("There are mismatched parentheses.");
-                    return null;
-                }
-                output.push(functionsstack.pop());
-            }
-        }
-        return output;
     }
 
     /**
