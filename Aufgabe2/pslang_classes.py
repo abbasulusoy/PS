@@ -325,4 +325,3 @@ class Executor:
         if rule.body.ret:
             rule.body.ret = output
         print(output)
-
