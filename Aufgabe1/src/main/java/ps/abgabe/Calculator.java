@@ -1,6 +1,7 @@
 package ps.abgabe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ public class Calculator {
         register = new ArrayList<>(32);
         register.add("0");
     }
+
     /**
      * @param value
      * @return get int value parse string to int
@@ -58,19 +60,25 @@ public class Calculator {
      * @return true or false 
      */
     public static boolean isFunctionSeparator(String token) {
-        if (token.equals(" ")) {
+        if (!token.equals(" ")) {
+            return false;
+        } else {
             return true;
         }
-        return false;
     }
 
+    /**
+     * @param token
+     * @return if token an operator is true then false
+     */
     public static boolean isOperator(String token) {
         if (token.equals("+") || token.equals("-") || token.equals("*") || token.equals("/") || token.equals("%")
                 || token.equals("!") || token.equals("&") || token.equals("|") || token.equals("=") || token.equals("<")
                 || token.equals(">")) {
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -141,10 +149,10 @@ public class Calculator {
                 negation(datastack.pop(), datastack);
                 break;
             case "c":
-                copy(datastack.pop(), datastack);
+                copy(datastack.peek(), datastack);
                 break;
             case "d":
-                delete(datastack.pop(), datastack);
+                delete(datastack.peek(), datastack);
                 break;
             case "a":
                 applimmediately(datastack.pop(), datastack);
@@ -354,7 +362,8 @@ public class Calculator {
      */
     private void delete(String find, DataStack<String> arguments) {
         if (isIntegerPositiv(find)) {
-            arguments.removeWithIndex(converToNumber(find));
+            Collections.reverse(arguments.getList());
+            arguments.removeWithIndex(converToNumber(find) - 1);
         }
     }
 
@@ -367,11 +376,13 @@ public class Calculator {
      * @param arguments
      * @return copy function c please see assignment one 
      */
-    private String copy(String find, DataStack<String> arguments) {
+    private void copy(String find, DataStack<String> arguments) {
         if (isIntegerPositiv(find)) {
-            return arguments.get(converToNumber(find));
+            String result = arguments.get(converToNumber(find));
+            arguments.pop();
+            arguments.push(result);
         }
-        return null;
+
     }
 
     /**
@@ -392,7 +403,7 @@ public class Calculator {
      * @return Checks if the top element on the data stack is an integer
      */
     private boolean isIntegerPositiv(String input) {
-        if (!isInteger(input)) {
+        if (!isNumeric(input)) {
             String message = "error ::" + input + " a not number.";
             throw new IllegalArgumentException(message);
         } else {
@@ -600,7 +611,7 @@ public class Calculator {
      * @param input
      * @return true or false
      */
-    private boolean isApplyImmediately(String input) {
+    public boolean isApplyImmediately(String input) {
         if (input.equals("a")) {
             return true;
         } else {

@@ -3,6 +3,7 @@ package ps.abgabe;
 import java.util.EmptyStackException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Basic implementation of a stack using a
@@ -86,6 +87,7 @@ public class DataStack<E> {
 	}
 	
     /**
+     * iterate list
      * @return E 
      */
 	public Iterator<E> iterator() {
@@ -123,6 +125,13 @@ public class DataStack<E> {
      */
     public E getLast() {
         return list.getLast();
+    }
+
+    /**
+     * @return list
+     */
+    public List<E> getList() {
+        return list;
     }
 
 }
