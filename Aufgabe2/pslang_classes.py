@@ -220,7 +220,7 @@ class Parser:
         length = len(prefix + name + ':' + '(' + ','.join(p.name for p in params) + ')')
         str_instr = str_rule[length + 1:self.find_last_non_escaped_char(str_rule, '(') - 1]
         if self.is_shell(str_rule):
-            return [str_instr]
+            return str_instr
         else:
             return self.parse_instructions(str_instr)
 
