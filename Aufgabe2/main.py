@@ -1,6 +1,7 @@
 from pslang_classes import *
 from helper_classes import *
 import sys
+import re
 
 
 def run():
@@ -40,7 +41,7 @@ def run():
         exec_queue.enqueue(i)
         # put all parameters into the variables list
         # will be put into dict later, why here?
-        #for p in i.body.params:
+        # for p in i.body.params:
         #    variables[p.var_id] = p.value
 
     while not exec_queue.is_empty():
@@ -53,31 +54,41 @@ def run():
             # found rule to executeparse_instructions
 
             # set param values
-            for rparam,iparam in zip(rule.body.params, instr.body.params):
-                variables[rparam] = iparam.name
+            for rparam, iparam in zip(rule.body.params, instr.body.params):
+                iparam.name = rparam.name
+                variables[rparam.var_id] = iparam
 
             # TODO: 1.3 + rekursive variablen werte finden und ersetzen und Eintrag in variables bearbeiten
-            for x in variables:
-                print(x.name +": "+variables[x])
-
+            # for x in variables:
+            #    print(x)
+            #    print(variables[x].name +": "+variables[x].value)
             if rule.is_shell:
                 print(rule.body.instructions)
                 for param in rule.body.params:
-                    rule.body.instructions[0] = rule.body.instructions[0].replace(" "+param.name+" ", variables[param.name].name)
+                    rule.body.instructions = re.sub(
+                        r"(?<!\\)" + variables[param.var_id].name.replace("+", "\+").replace("*", "\*") + r"(?!\w)",
+                        variables[param.var_id].value, rule.body.instructions)
                 executor.execute_shell_instruction(rule)
                 # TODO: return wert in variable-liste ersetzen
                 if rule.body.ret == "":
-                    variables[rule.body.ret.var_id] = rule.body.ret.value
+                    variables[rule.body.ret.var_id] = rule.body.ret
             else:
+
                 # put all instructions into the queue
                 for i in rule.body.instructions:
+                    #print(i.is_shell)
                     # TODO: 2.1 Parameter und return Variablen in variables-liste schreiben
-                    if rule.body.ret:
-                        variables[rule.body.ret.var_id] = rule.body.ret.value
-                    if rule.body.params:
-                        variables[rule.body.params.var_id] = rule.body.params.value
+                    if i.body.ret:
+                        variables[i.body.ret.var_id] = i.body.ret
+                        print(variables[i.body.ret.var_id])
+                    if i.body.params:
+                        for p in i.body.params:
+                            for rp in rule.body.params:
+                                if p.name == rp.name:
+                                    variables[p.var_id] = rp
 
                     exec_queue.enqueue(i)
+
 
 if __name__ == "__main__":
     run()

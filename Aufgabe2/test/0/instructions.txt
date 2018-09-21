@@ -1,2 +1,3 @@
-$main(HelloWorld)();
+main(/home/fabian/PycharmProjects/PS/Aufgabe2)();
+
 
