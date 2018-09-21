@@ -39,24 +39,29 @@ public class StackCalculator {
 
         Iterator<String> iter = inputs.iterator();
         while (iter.hasNext()) {
-            String token = inputs.pop();
-            if (calculator.isUnaryOperator(token)) {
-                calculator.evaluateUnaryOperator(token, inputs);
-                if (calculator.isApplyImmediately(token)) {
-                    List<String> result = getStringFromListToExecute(inputs.pop());
-                    for (String s : result) {
-                        if (calculator.isNumeric(s)) {
-                            inputs.push(s);
-                        } else {
-                            calculator.evaluateUnaryOperator(s, inputs);
+            if (inputs.size() > 0) {
+                String token = inputs.pop();
+                if (calculator.isUnaryOperator(token)) {
+                    calculator.evaluateUnaryOperator(token, inputs);
+                    if (calculator.isApplyImmediately(token)) {
+                        List<String> result = getStringFromListToExecute(inputs.pop());
+                        for (String s : result) {
+                            if (calculator.isNumeric(s)) {
+                                inputs.push(s);
+                            } else {
+                                if (calculator.isUnaryOperator(s)) {
+                                    calculator.evaluateUnaryOperator(s, inputs);
+                                } else {
+                                    calculator.evaluateOperator(s, inputs);
+                                }
+                            }
                         }
                     }
+                } else {
+                    calculator.evaluateOperator(token, inputs);
                 }
-            } else {
-                calculator.evaluateOperator(token, inputs);
             }
         }
-
         for (String s : inputs.getList()) {
             System.out.println("Item ::" + s);
         }

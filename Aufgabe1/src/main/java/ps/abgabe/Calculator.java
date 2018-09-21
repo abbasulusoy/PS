@@ -25,7 +25,7 @@ public class Calculator {
      * @return get int value parse string to int
      */
     private Integer getIntValue(String value) {
-        return getIntValue(value);
+        return Integer.parseInt(value);
     }
 
     /**
@@ -91,7 +91,7 @@ public class Calculator {
      *            - list of arguments for the operator
      * @return a result for a operator token
      */
-    public Integer evaluateOperator(String token, DataStack<String> dataStack) {
+    public void evaluateOperator(String token, DataStack<String> dataStack) {
         Integer result = null;
 
         switch (token) {
@@ -115,7 +115,7 @@ public class Calculator {
                 if (temp != null) {
                     result = temp.intValue();
                 } else {
-                    return null;
+                    result = null;
                 }
                 break;
             case "<":
@@ -130,8 +130,7 @@ public class Calculator {
             default:
                 result = 0;
         }
-
-        return result;
+        dataStack.push(result.toString());
     }
 
     /**
@@ -152,7 +151,7 @@ public class Calculator {
                 copy(datastack.peek(), datastack);
                 break;
             case "d":
-                delete(datastack.peek(), datastack);
+                delete(datastack.pop(), datastack);
                 break;
             case "a":
                 applimmediately(datastack.pop(), datastack);
@@ -364,6 +363,7 @@ public class Calculator {
         if (isIntegerPositiv(find)) {
             Collections.reverse(arguments.getList());
             arguments.removeWithIndex(converToNumber(find) - 1);
+            //Collections.reverse(arguments.getList());
         }
     }
 
