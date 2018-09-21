@@ -26,21 +26,22 @@ def run():
 
     '''
     format:
-    variables = [
-        {UUID: [value | UUID]},
-        {UUID: [value | UUID]},
+    variables = {
+        UUID: [value | UUID],
+        UUID: [value | UUID],
         ...
-    ] 
+    }
     '''
-    variables = []
+    variables = {}
 
     exec_queue = Queue()
     for i in initial_instructions:
         # put all initial instructions into the queue
         exec_queue.enqueue(i)
         # put all parameters into the variables list
-        for p in i.body.params:
-            variables.append({p.var_id: p.value})
+        # will be put into dict later, why here?
+        #for p in i.body.params:
+        #    variables[p.var_id] = p.value
 
     while not exec_queue.is_empty():
         instr = exec_queue.dequeue()
@@ -49,30 +50,34 @@ def run():
                 # if instruction and rule does not match, ignore
                 continue
 
-            # found rule to execute
+            # found rule to executeparse_instructions
 
             # set param values
             for rparam,iparam in zip(rule.body.params, instr.body.params):
-                rparam.value = iparam.name
-                entry = {
-                    rparam.var_id: rparam.value
-                }
-                variables.append(entry)
+                variables[rparam] = iparam.name
 
             # TODO: 1.3 + rekursive variablen werte finden und ersetzen und Eintrag in variables bearbeiten
+            for x in variables:
+                print(x.name +": "+variables[x])
 
             if rule.is_shell:
+                print(rule.body.instructions)
+                for param in rule.body.params:
+                    rule.body.instructions[0] = rule.body.instructions[0].replace(" "+param.name+" ", variables[param.name].name)
                 executor.execute_shell_instruction(rule)
                 # TODO: return wert in variable-liste ersetzen
-                # if rule.body.ret != EMPTY_STRING:
-                #   add value to list
+                if rule.body.ret == "":
+                    variables[rule.body.ret.var_id] = rule.body.ret.value
             else:
                 # put all instructions into the queue
                 for i in rule.body.instructions:
                     # TODO: 2.1 Parameter und return Variablen in variables-liste schreiben
+                    if rule.body.ret:
+                        variables[rule.body.ret.var_id] = rule.body.ret.value
+                    if rule.body.params:
+                        variables[rule.body.params.var_id] = rule.body.params.value
+
                     exec_queue.enqueue(i)
-
-
 
 if __name__ == "__main__":
     run()

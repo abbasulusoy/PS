@@ -319,7 +319,8 @@ class Executor:
         pass
 
     def execute_shell_instruction(self, rule):
-        # TODO: alle parameter in shell command ersetzen und dann ausführen
+        # TODO: alle parameter in shell command ersetzen und dann ausfuehren
+
         output = subprocess.check_output(rule.body.instructions, shell=True).decode('ascii')
         if rule.body.ret:
             rule.body.ret = output

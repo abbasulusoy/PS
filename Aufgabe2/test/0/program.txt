@@ -1,1 +1,1 @@
-$main:()(echo Hello World;)().
+$main:(+a)(echo +a ;)().
