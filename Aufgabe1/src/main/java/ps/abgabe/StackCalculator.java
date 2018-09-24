@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.naming.spi.DirStateFactory.Result;
+
 /**
  * @author Abbas ULUSOY fill stacks with operators and values
  *
@@ -32,17 +34,21 @@ public class StackCalculator {
 		outputs.push("3");
 
 		exprArray = expression.split("");
+		String resul="";
 		for (int i = 0; i < expression.length(); i++) {
-			String result = "";
 			if (expression.charAt(i) == '(') {
-				result = expression.substring(expression.charAt(i));
 				String list = generateList(expression);
-				outputs.push(result);
-				outputs.push(list);
-				expression = expression.replace(list, "");
-			} 
-
+				if(!list.isEmpty()) {
+					outputs.push(list);
+					expression = expression.replace(list, "");
+					i=0;
+				} 
+				
+			} else {
+				outputs.push(expression.charAt(i)+"");
+			}
 		}
+		
 		
 		for (String s : outputs.getList()) {
 			System.out.println("Item ::" + s);
@@ -52,7 +58,6 @@ public class StackCalculator {
 
 		while (iter.hasNext()) {
 			String token = inputStream.pop();
-
 			if (calculator.isUnaryOperator(token)) {
 				calculator.evaluateUnaryOperator(token, inputStream, outputs);
 			} else if (calculator.isBinaryOperator(token)) {
@@ -60,9 +65,11 @@ public class StackCalculator {
 			} else if (calculator.isNumeric(token)) {
 				outputs.push(token);
 			}
-
 		}
 		
+		for (String s : outputs.getList()) {
+			System.out.println("Result ::" + s);
+		}
 	}
 
 	public List<String> getStringFromListToExecute(String strFromList) {
