@@ -5,71 +5,94 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author Abbas ULUSOY 
- * fill stacks with operators and values 
+ * @author Abbas ULUSOY fill stacks with operators and values
  *
  */
 public class StackCalculator {
 
-    DataStack<String> outputs = new DataStack<String>();
-    DataStack<String> inputs = new DataStack<String>();
-    Calculator calculator = new Calculator();
+	DataStack<String> outputs = new DataStack<String>();
+	DataStack<String> inputs = new DataStack<String>();
+	Calculator calculator = new Calculator();
 
-    /**
-     * Evaluates the expression
-     * @param expr input linked list, each operator/number is stored in the
-     *            list as an element
-     * @return string - result as a string
-     */
-    public void evaluate(String expr) {
-        String[] exprArray = null;
-        DataStack<String> inputs = new DataStack<>();
-        DataStack<String> output = new DataStack<>();
+	/**
+	 * Evaluates the expression
+	 * 
+	 * @param inputStream
+	 *            input linked list, each operator/number is stored in the list
+	 *            as an element
+	 * @return string - result as a string
+	 */
+	public void evaluate(String expression) {
+		String[] exprArray = null;
+		DataStack<String> inputStream = new DataStack<>();
+		DataStack<String> outputs = new DataStack<>();
 
-        inputs.push("0");
-        if (expr.contains("(") || expr.contains(")")) {
-            exprArray = expr.split("\\)");
-            for (String s : exprArray) {
-                if (s.contains("(")) {
-                    s = s + ")";
-                }
-                inputs.push(s);
-            }
-        }
+		inputStream.push(expression.substring(expression.length() - 1));
+		expression = expression.substring(0, expression.length() - 1);
+		outputs.push("3");
 
-        Iterator<String> iter = inputs.iterator();
-        while (iter.hasNext()) {
-            if (inputs.size() > 0) {
-                String token = inputs.pop();
-                if (calculator.isUnaryOperator(token)) {
-                    calculator.evaluateUnaryOperator(token, inputs);
-                    if (calculator.isApplyImmediately(token)) {
-                        List<String> result = getStringFromListToExecute(inputs.pop());
-                        for (String s : result) {
-                            if (calculator.isNumeric(s)) {
-                                inputs.push(s);
-                            } else {
-                                if (calculator.isUnaryOperator(s)) {
-                                    calculator.evaluateUnaryOperator(s, inputs);
-                                } else {
-                                    calculator.evaluateOperator(s, inputs);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    calculator.evaluateOperator(token, inputs);
-                }
-            }
-        }
-        for (String s : inputs.getList()) {
-            System.out.println("Item ::" + s);
-        }
-    }
+		exprArray = expression.split("");
+		for (int i = 0; i < expression.length(); i++) {
+			String result = "";
+			if (expression.charAt(i) == '(') {
+				result = expression.substring(expression.charAt(i));
+				String list = generateList(expression);
+				outputs.push(result);
+				outputs.push(list);
+				expression = expression.replace(list, "");
+			} 
 
-    public List<String> getStringFromListToExecute(String strFromList) {
-        List<String> separteList = Arrays.asList(strFromList.split(""));
-        return separteList;
-    }
+		}
+		
+		for (String s : outputs.getList()) {
+			System.out.println("Item ::" + s);
+		}
 
+		Iterator<String> iter = inputStream.iterator();
+
+		while (iter.hasNext()) {
+			String token = inputStream.pop();
+
+			if (calculator.isUnaryOperator(token)) {
+				calculator.evaluateUnaryOperator(token, inputStream, outputs);
+			} else if (calculator.isBinaryOperator(token)) {
+				calculator.evaluateOperator(token, outputs);
+			} else if (calculator.isNumeric(token)) {
+				outputs.push(token);
+			}
+
+		}
+		
+	}
+
+	public List<String> getStringFromListToExecute(String strFromList) {
+		List<String> separteList = Arrays.asList(strFromList.split(""));
+		return separteList;
+	}
+
+	public static String generateList(String expression) {
+
+		int open = 0;
+		String list = "";
+
+		for (int i = 0; i < expression.length(); i++) {
+			if (expression.charAt(i) == '(') {
+				open++;
+			} else if (expression.charAt(i) == ')') {
+
+				open--;
+			}
+			if (open > 0) {
+				list += expression.charAt(i);
+			} else {
+				list += expression.charAt(i);
+				break;
+			}
+		}
+		return list;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(generateList("(2c1 3c-1c1=3c()(3c4d1+da)a2d*)2c3d2ca2d"));
+	}
 }
