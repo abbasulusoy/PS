@@ -42,8 +42,8 @@ def run():
         # put all parameters into the variables list
         # will be put into dict later, why here?
         for iparam in ri.body.params:
-            print("a " + iparam.var_id + "   " + iparam.name + " " + str(iparam.value))
-            variables[iparam.var_id] = iparam
+            #print("a " + iparam.var_id + "   " + iparam.name + " " + str(iparam.value))
+            variables[iparam.var_id] = Variable.copyOf(iparam)
 
     while not exec_queue.is_empty():
         instr = exec_queue.dequeue()
@@ -62,27 +62,52 @@ def run():
             # set param values
             for rparam, iparam in zip(rule.body.params, instr.body.params):
                 if rparam.vtype == "OPEN+":
+                    print("A: VARIABLES["+iparam.var_id+"]: " + str(variables[iparam.var_id].value))
                     tmpValue = variables[iparam.var_id].value
 
-                    variables[rparam.var_id] = variables[iparam.var_id]
+                    tmp0 = Variable.copyOf(variables[iparam.var_id])
+
+                    variables[rparam.var_id] = tmp0
                     variables[rparam.var_id].name = rparam.name
                     variables[rparam.var_id].value = tmpValue
-                    print("b " + rparam.var_id + "   " + variables[rparam.var_id].name + "  " + str(variables[rparam.var_id].value))
+                    variables[rparam.var_id].vtype = "OPEN+"
+                    print("B: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
+                    #print("b " + rparam.var_id + "   " + variables[rparam.var_id].name + "  " + str(variables[rparam.var_id].value))
 
-                    #variables[iparam.var_id].name = rparam.name.split("*")[0]
-                    variables[rparam.var_id+"-0"] = variables[iparam.var_id]
+                    tmp1 = Variable.copyOf(variables[iparam.var_id])
+
+                    variables[rparam.var_id+"-0"] = tmp1
                     variables[rparam.var_id+"-0"].name = rparam.name.split("*")[0]
                     variables[rparam.var_id+"-0"].value = [tmpValue[0]]
-                    print("c " + rparam.var_id+"-0" + "   " + variables[rparam.var_id+"-0"].name + "  " + str(variables[rparam.var_id+"-0"].value))
+                    variables[rparam.var_id+"-0"].vtype = "CLOSED"
+                    print("C: VARIABLES[" + rparam.var_id + "-0]: " + str(variables[rparam.var_id+"-0"].value))
+                    #print("c " + rparam.var_id+"-0" + "   " + variables[rparam.var_id+"-0"].name + "  " + str(variables[rparam.var_id+"-0"].value))
 
-                    variables[rparam.var_id+"-1"] = variables[iparam.var_id]
+                    tmp2 = Variable.copyOf(variables[iparam.var_id])
+
+                    variables[rparam.var_id+"-1"] = tmp2
                     variables[rparam.var_id+"-1"].name = "*"+rparam.name.split("*")[1]
                     variables[rparam.var_id+"-1"].value = tmpValue[1:]
-                    print("d " + rparam.var_id+"-1" + "   " + variables[rparam.var_id+"-1"].name + "  " + str(variables[rparam.var_id+"-1"].value))
-                else:
-                    variables[rparam.var_id] = variables[iparam.var_id]
+                    variables[rparam.var_id+"-1"].vtype = "OPEN"
+                    print("D: VARIABLES[" + rparam.var_id + "-1]: " + str(variables[rparam.var_id+"-1"].value))
+                    #print("d " + rparam.var_id+"-1" + "   " + variables[rparam.var_id+"-1"].name + "  " + str(variables[rparam.var_id+"-1"].value))
+                elif rparam.vtype == "OPEN":
+                    print(rparam.name + "  " + rparam.vtype)
+                    tmp = Variable.copyOf(variables[iparam.var_id])
+                    variables[rparam.var_id] = tmp
                     variables[rparam.var_id].name = rparam.name
-                    print("e " + rparam.var_id + "   " + variables[rparam.var_id].name+"  "+str(variables[rparam.var_id].value))
+                    variables[rparam.var_id].vtype = "OPEN"
+                    variables[rparam.var_id].value = tmp.value
+                    print("E1: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
+                    #print("e " + rparam.var_id + "   " + variables[rparam.var_id].name+"  "+str(variables[rparam.var_id].value))
+                else:
+                    tmp = Variable.copyOf(variables[iparam.var_id])
+                    variables[rparam.var_id] = tmp
+                    variables[rparam.var_id].name = rparam.name
+                    variables[rparam.var_id].vtype = "CLOSED"
+                    variables[rparam.var_id].value = tmp.value
+                    print("E2: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
+                    # print("e " + rparam.var_id + "   " + variables[rparam.var_id].name+"  "+str(variables[rparam.var_id].value))
 
             # TODO: 1.3 + rekursive variablen werte finden und ersetzen und Eintrag in variables bearbeiten
             # for x in variables:
@@ -110,20 +135,25 @@ def run():
                     if ri.body.params:
                         for iparam in ri.body.params:
                             for rparam in rule.body.params:
+                                tmp = Variable.copyOf(variables[rparam.var_id])
                                 if iparam.name == rparam.name:
-                                    variables[iparam.var_id] = variables[rparam.var_id]
-                                    print(iparam.name + " " + str(rparam.value) + str(variables[rparam.var_id].value))
-                                    print("i " + iparam.var_id + "   " + variables[iparam.var_id].name + "  " + str(variables[iparam.var_id].value))
+                                    variables[iparam.var_id] = tmp
+                                    print("I: VARIABLES[" + iparam.var_id + "]: " + str(variables[iparam.var_id].value))
+                                    #print("i " + iparam.var_id + "   " + variables[iparam.var_id].name + "  " + str(variables[iparam.var_id].value))
                                 elif rparam.vtype == "OPEN+":
                                     plus = rparam.name.split("*")[0]
                                     star = "*"+rparam.name.split("*")[1]
                                     #print(ip.var_id+"-0"+"     "+rp.var_id)
                                     if plus == iparam.name:
-                                        variables[iparam.var_id+"-0"] = variables[rparam.var_id]
-                                        print("g " + iparam.var_id+"-0" + "   " + variables[iparam.var_id+"-0"].name + "  " + str(variables[iparam.var_id+"-0"].value))
+                                        variables[iparam.var_id+"-0"] = tmp
+                                        variables[iparam.var_id+"-0"].vtype = "CLOSED"
+                                        print("G: VARIABLES[" + iparam.var_id + "-0]: " + str(variables[iparam.var_id+"-0"].value))
+                                        #print("g " + iparam.var_id+"-0" + "   " + variables[iparam.var_id+"-0"].name + "  " + str(variables[iparam.var_id+"-0"].value))
                                     elif star == iparam.name:
-                                        variables[iparam.var_id+"-1"] = variables[rparam.var_id]
-                                        print("h " + iparam.var_id + "-1" + "   " + variables[iparam.var_id+"-1"].name + "  " + str(variables[iparam.var_id+"-1"].value))
+                                        variables[iparam.var_id+"-1"] = tmp
+                                        variables[iparam.var_id+"-1"].vtype = "OPEN"
+                                        print("H: VARIABLES[" + iparam.var_id + "-1]: " + str(variables[iparam.var_id+"-1"].value))
+                                        #print("h " + iparam.var_id + "-1" + "   " + variables[iparam.var_id+"-1"].name + "  " + str(variables[iparam.var_id+"-1"].value))
 
                     exec_queue.enqueue(ri)
             print("END OF FOR")

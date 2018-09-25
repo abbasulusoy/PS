@@ -31,6 +31,12 @@ class Variable:
         self.vtype = vtype
         self.value = value
 
+    @staticmethod
+    def copyOf(var):
+        tmp = Variable(var.name, var.vtype, var.value)
+        tmp.var_id = var.var_id
+        return tmp
+
 
 class Parser:
     def __init__(self):
