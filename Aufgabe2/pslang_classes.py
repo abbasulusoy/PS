@@ -247,7 +247,7 @@ class Parser:
             par = Variable(p, "", p.split(" "))
             if '*' in p and '+' in p:
                 par.vtype = "OPEN+"
-            elif '*' in p or len(p) > 1:
+            elif '*' in p or len(p.split(" ")) > 1:
                 par.vtype = "OPEN"
             else:
                 par.vtype = "CLOSED"
