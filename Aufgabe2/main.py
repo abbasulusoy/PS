@@ -62,32 +62,37 @@ def run():
             # set param values
             for rparam, iparam in zip(rule.body.params, instr.body.params):
                 if rparam.vtype == "OPEN+":
-                    print("A: VARIABLES["+iparam.var_id+"]: " + str(variables[iparam.var_id].value))
-
                     value = variables[iparam.var_id].value
 
                     var = Variable(rparam.name, "OPEN+", value)
-
                     variables[rparam.var_id] = var
-                    print("B: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
+                    print("A: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
 
                     var = Variable(rparam.name.split("*")[0], "CLOSED", [value[0]])
-
                     variables[rparam.var_id+"-0"] = var
-                    print("C: VARIABLES[" + rparam.var_id + "-0]: " + str(variables[rparam.var_id+"-0"].value))
+                    print("B: VARIABLES[" + rparam.var_id + "-0]: " + str(variables[rparam.var_id+"-0"].value))
 
                     var = Variable("*"+rparam.name.split("*")[1], "OPEN", value[1:])
-
                     variables[rparam.var_id+"-1"] = var
-                    print("D: VARIABLES[" + rparam.var_id + "-1]: " + str(variables[rparam.var_id+"-1"].value))
+                    print("C: VARIABLES[" + rparam.var_id + "-1]: " + str(variables[rparam.var_id+"-1"].value))
                 elif rparam.vtype == "OPEN":
-                    var = Variable(rparam.name, "OPEN", variables[iparam.var_id+"-1"].value)
-                    variables[rparam.var_id] = var
-                    print("E1: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
+                    if iparam.var_id+"-1" in variables:
+                        var = Variable(rparam.name, "OPEN", variables[iparam.var_id + "-1"].value)
+                        variables[rparam.var_id+"-1"] = var
+                        print("D1: VARIABLES[" + rparam.var_id + "-1]: " + str(variables[rparam.var_id+"-1"].value))
+                    else:
+                        var = Variable(rparam.name, "OPEN", variables[iparam.var_id].value)
+                        variables[rparam.var_id] = var
+                        print("D2: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
                 else:
-                    var = Variable(rparam.name, "CLOSED", variables[iparam.var_id+"-0"].value)
-                    variables[rparam.var_id] = var
-                    print("E2: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
+                    if iparam.var_id+"-0" in variables:
+                        var = Variable(rparam.name, "CLOSED", variables[iparam.var_id + "-0"].value)
+                        variables[rparam.var_id+"-0"] = var
+                        print("E1: VARIABLES[" + rparam.var_id+"-0]: " + str(variables[rparam.var_id+"-0"].value))
+                    else:
+                        var = Variable(rparam.name, "CLOSED", variables[iparam.var_id].value)
+                        variables[rparam.var_id] = var
+                        print("E2: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
 
             # TODO: 1.3 + rekursive variablen werte finden und ersetzen und Eintrag in variables bearbeiten
             # for x in variables:
@@ -96,13 +101,25 @@ def run():
             if rule.is_shell:
                 #print(rule.body.instructions)
                 for param in rule.body.params:
+                    if param.vtype == "OPEN":
+                        if param.var_id+"-1" in variables:
+                            id = param.var_id+"-1"
+                        else:
+                            id = param.var_id
+                    elif param.vtype == "CLOSED":
+                        if param.var_id+"-0" in variables:
+                            id = param.var_id+"-0"
+                        else:
+                            id = param.var_id
+                    else:
+                        id = param.var_id
                     rule.body.instructions = re.sub(
-                        r"(?<!\\)" + variables[param.var_id].name.replace("+", "\+").replace("*", "\*") + r"(?!\w)",
-                        " ".join(variables[param.var_id].value), rule.body.instructions)
+                        r"(?<!\\)" + variables[id].name.replace("+", "\+").replace("*", "\*") + r"(?!\w)",
+                        " ".join(variables[id].value), rule.body.instructions)
                 executor.execute_shell_instruction(rule, instr)
                 # TODO: return wert in variable-liste ersetzen
                 if instr.body.ret:
-                    print("f " + rule.body.ret.var_id + "   " + instr.body.ret.name + "  " +str(instr.body.ret.value))
+                    #print("f " + rule.body.ret.var_id + "   " + instr.body.ret.name + "  " +str(instr.body.ret.value))
                     variables[rule.body.ret.var_id] = instr.body.ret
             else:
 
@@ -115,11 +132,12 @@ def run():
                     if ri.body.params:
                         for iparam in ri.body.params:
                             for rparam in rule.body.params:
-                                var = Variable(variables[rparam.var_id].name, "", variables[rparam.var_id].value)
+                                #print(rparam.name + "  " + rparam.vtype)
+                                var = Variable(variables[rparam.var_id+"-0"].name, "", variables[rparam.var_id+"-0"].value)
                                 if iparam.name == rparam.name:
                                     var.vtype = iparam.vtype
                                     variables[iparam.var_id] = var
-                                    print("I: VARIABLES[" + iparam.var_id + "]: " + str(variables[iparam.var_id].value))
+                                    print("F: VARIABLES[" + iparam.var_id + "]: " + str(variables[iparam.var_id].value))
                                 elif rparam.vtype == "OPEN+":
                                     plus = rparam.name.split("*")[0]
                                     star = "*"+rparam.name.split("*")[1]

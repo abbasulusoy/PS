@@ -315,9 +315,11 @@ class Matcher:
         :return:
         '''
         for ip, rp in zip(instr_params, rule_params):
-            if ip.vtype[0] != rp.vtype[0]:
-                return False
-        return True
+            if rp.vtype == ip.vtype:
+                return True
+            if rp.vtype == "OPEN+" and ip.vtype == "OPEN":
+                return True
+        return False
 
 
 class Executor:
