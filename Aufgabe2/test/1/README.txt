@@ -1,0 +1,1 @@
+gets some names as strings and prints "Hello <NAME>." for every name

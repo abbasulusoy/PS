@@ -3,6 +3,7 @@ package ps.abgabe;
 import java.util.EmptyStackException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Basic implementation of a stack using a
@@ -40,9 +41,10 @@ public class DataStack<E> {
 	}
 	
 	/**
-	 * Pops an object off the top of the stack
-	 * @return popped object
-	 */
+     * 
+     * Pops an object off the top of the stack
+     * @return popped object
+     */
 	public E pop() {
 		if(isEmpty())
 			throw new EmptyStackException();
@@ -77,12 +79,59 @@ public class DataStack<E> {
 		return list.remove();
 	}
 
+    /**
+     * @return E 
+     */
 	public E removeFirst() {
 		return list.removeFirst();
 	}
 	
+    /**
+     * iterate list
+     * @return E 
+     */
 	public Iterator<E> iterator() {
 		return list.iterator();
 	}
 	
+    /**
+     * 
+     * @param index
+     * @return E
+     */
+    public E get(int index) {
+        return list.get(index);
+    }
+
+    /**
+     * @param index
+     * @return E object
+     */
+    public E removeWithIndex(int index) {
+        return list.remove(index);
+    }
+
+    /**
+     * @param e object 
+     * @return E
+     */
+    public E addLast(E e) {
+        list.addLast(e);
+        return list.getLast();
+    }
+
+    /**
+     * @return get last element from stack
+     */
+    public E getLast() {
+        return list.getLast();
+    }
+
+    /**
+     * @return list
+     */
+    public List<E> getList() {
+        return list;
+    }
+
 }
