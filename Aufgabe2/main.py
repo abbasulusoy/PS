@@ -41,8 +41,8 @@ def run():
         exec_queue.enqueue(i)
         # put all parameters into the variables list
         # will be put into dict later, why here?
-        # for p in i.body.params:
-        #    variables[p.var_id] = p.value
+        for p in i.body.params:
+            variables[p.var_id] = p
 
     while not exec_queue.is_empty():
         instr = exec_queue.dequeue()
@@ -50,28 +50,35 @@ def run():
             if not Matcher.match_instruction_rule(instr, rule):
                 # if instruction and rule does not match, ignore
                 continue
-
             # found rule to executeparse_instructions
 
             # set param values
             for rparam, iparam in zip(rule.body.params, instr.body.params):
-                iparam.name = rparam.name
-                variables[rparam.var_id] = iparam
+                if rparam.vtype == "OPEN+":
+                    variables[iparam.var_id].name = rparam.name
+                    variables[rparam.var_id] = variables[iparam.var_id]
+                    variables[iparam.var_id].name = rparam.name.split("*")[0]
+                    variables[rparam.var_id+"-0"] = variables[iparam.var_id]
+                    variables[iparam.var_id].name = "*"+rparam.name.split("*")[1]
+                    variables[rparam.var_id+"-1"] = variables[iparam.var_id]
+                else:
+                    variables[iparam.var_id].name = rparam.name
+                    variables[rparam.var_id] = variables[iparam.var_id]
 
             # TODO: 1.3 + rekursive variablen werte finden und ersetzen und Eintrag in variables bearbeiten
             # for x in variables:
             #    print(x)
             #    print(variables[x].name +": "+variables[x].value)
             if rule.is_shell:
-                print(rule.body.instructions)
+                #print(rule.body.instructions)
                 for param in rule.body.params:
                     rule.body.instructions = re.sub(
                         r"(?<!\\)" + variables[param.var_id].name.replace("+", "\+").replace("*", "\*") + r"(?!\w)",
                         variables[param.var_id].value, rule.body.instructions)
-                executor.execute_shell_instruction(rule)
+                executor.execute_shell_instruction(rule, instr)
                 # TODO: return wert in variable-liste ersetzen
-                if rule.body.ret == "":
-                    variables[rule.body.ret.var_id] = rule.body.ret
+                if instr.body.ret:
+                    variables[rule.body.ret.var_id] = instr.body.ret
             else:
 
                 # put all instructions into the queue
@@ -79,16 +86,21 @@ def run():
                     #print(i.is_shell)
                     # TODO: 2.1 Parameter und return Variablen in variables-liste schreiben
                     if i.body.ret:
-                        variables[i.body.ret.var_id] = i.body.ret
-                        print(variables[i.body.ret.var_id])
+                        variables[rule.body.ret.var_id] = i.body.ret
                     if i.body.params:
                         for p in i.body.params:
                             for rp in rule.body.params:
                                 if p.name == rp.name:
-                                    variables[p.var_id] = rp
+                                    variables[p.var_id] = variables[rp.var_id]
+                                elif rp.vtype == "OPEN+":
+                                    plus = rp.name.split("*")[0]
+                                    star = "*"+rp.name.split("*")[1]
+                                    if plus == p.name:
+                                        variables[p.var_id+"-0"] = variables[rp.var_id]
+                                    elif star == p.name:
+                                        variables[p.var_id+"-1"] = variables[rp.var_id]
 
                     exec_queue.enqueue(i)
-
 
 if __name__ == "__main__":
     run()
