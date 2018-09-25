@@ -82,7 +82,7 @@ class Parser:
         :return:
         '''
         str = str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
-        return Variable(str, "OPEN", str)
+        return Variable(str, "OPEN", str.split(" "))
 
     def first_alphabetical_substring(self, string):
         '''
@@ -238,10 +238,10 @@ class Parser:
                 # .split(',') on an empty string will return ['']
                 # which should be ignored
                 continue
-            par = Variable(p, "", p)
+            par = Variable(p, "", p.split(" "))
             if '*' in p and '+' in p:
                 par.vtype = "OPEN+"
-            elif '*' in p or len(p.strip().split(' ')) > 1:
+            elif '*' in p or len(p) > 1:
                 par.vtype = "OPEN"
             else:
                 par.vtype = "CLOSED"
@@ -323,5 +323,5 @@ class Executor:
 
         output = subprocess.check_output(rule.body.instructions, shell=True).decode('ascii')
         if rule.body.ret:
-            instr.body.ret.value = output
+            instr.body.ret.value = output.split("\n")
         print(output)
