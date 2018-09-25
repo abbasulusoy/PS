@@ -43,7 +43,7 @@ def run():
         # will be put into dict later, why here?
         for iparam in ri.body.params:
             #print("a " + iparam.var_id + "   " + iparam.name + " " + str(iparam.value))
-            variables[iparam.var_id] = Variable.copyOf(iparam)
+            variables[iparam.var_id] = Variable(iparam.name, iparam.vtype, iparam.value)
 
     while not exec_queue.is_empty():
         instr = exec_queue.dequeue()
@@ -64,19 +64,19 @@ def run():
                 if rparam.vtype == "OPEN+":
                     print("A: VARIABLES["+iparam.var_id+"]: " + str(variables[iparam.var_id].value))
 
-                    copy = Variable.copyOf(variables[iparam.var_id])
+                    value = variables[iparam.var_id].value
 
-                    var = Variable(rparam.name, "OPEN+", copy.value)
+                    var = Variable(rparam.name, "OPEN+", value)
 
                     variables[rparam.var_id] = var
                     print("B: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
 
-                    var = Variable(rparam.name.split("*")[0], "CLOSED", copy.value[0])
+                    var = Variable(rparam.name.split("*")[0], "CLOSED", [value[0]])
 
                     variables[rparam.var_id+"-0"] = var
                     print("C: VARIABLES[" + rparam.var_id + "-0]: " + str(variables[rparam.var_id+"-0"].value))
 
-                    var = Variable("*"+rparam.name.split("*")[1], "OPEN", copy.value[1:])
+                    var = Variable("*"+rparam.name.split("*")[1], "OPEN", value[1:])
 
                     variables[rparam.var_id+"-1"] = var
                     print("D: VARIABLES[" + rparam.var_id + "-1]: " + str(variables[rparam.var_id+"-1"].value))
