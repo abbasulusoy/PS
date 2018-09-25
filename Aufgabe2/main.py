@@ -64,24 +64,25 @@ def run():
                 if rparam.vtype == "OPEN+":
                     tmpValue = variables[iparam.var_id].value
 
-                    variables[iparam.var_id].name = rparam.name
-                    print("b " + rparam.var_id + "   " + variables[iparam.var_id].name+"  "+str(variables[iparam.var_id].value))
                     variables[rparam.var_id] = variables[iparam.var_id]
-                    print("XXXXXXXXX " + rparam.var_id + " " + str(variables[rparam.var_id].value))
+                    variables[rparam.var_id].name = rparam.name
+                    variables[rparam.var_id].value = tmpValue
+                    print("b " + rparam.var_id + "   " + variables[rparam.var_id].name + "  " + str(variables[rparam.var_id].value))
 
-                    variables[iparam.var_id].name = rparam.name.split("*")[0]
-                    variables[iparam.var_id].value = [tmpValue[0]]
-                    print("c " + rparam.var_id+"-0" + "   " + variables[iparam.var_id].name+"  "+str(variables[iparam.var_id].value))
+                    #variables[iparam.var_id].name = rparam.name.split("*")[0]
                     variables[rparam.var_id+"-0"] = variables[iparam.var_id]
+                    variables[rparam.var_id+"-0"].name = rparam.name.split("*")[0]
+                    variables[rparam.var_id+"-0"].value = [tmpValue[0]]
+                    print("c " + rparam.var_id+"-0" + "   " + variables[rparam.var_id+"-0"].name + "  " + str(variables[rparam.var_id+"-0"].value))
 
-                    variables[iparam.var_id].name = "*"+rparam.name.split("*")[1]
-                    variables[iparam.var_id].value = tmpValue[1:]
-                    print("d " + rparam.var_id+"-1" + "   " + variables[iparam.var_id].name+"  "+str(variables[iparam.var_id].value))
                     variables[rparam.var_id+"-1"] = variables[iparam.var_id]
+                    variables[rparam.var_id+"-1"].name = "*"+rparam.name.split("*")[1]
+                    variables[rparam.var_id+"-1"].value = tmpValue[1:]
+                    print("d " + rparam.var_id+"-1" + "   " + variables[rparam.var_id+"-1"].name + "  " + str(variables[rparam.var_id+"-1"].value))
                 else:
-                    variables[iparam.var_id].name = rparam.name
-                    print("e " + rparam.var_id + "   " + variables[iparam.var_id].name+"  "+str(variables[iparam.var_id].value))
                     variables[rparam.var_id] = variables[iparam.var_id]
+                    variables[rparam.var_id].name = rparam.name
+                    print("e " + rparam.var_id + "   " + variables[rparam.var_id].name+"  "+str(variables[rparam.var_id].value))
 
             # TODO: 1.3 + rekursive variablen werte finden und ersetzen und Eintrag in variables bearbeiten
             # for x in variables:
@@ -110,21 +111,22 @@ def run():
                         for ip in ri.body.params:
                             for rp in rule.body.params:
                                 if ip.name == rp.name:
-                                    print(ip.name + " " + rp.var_id)
-                                    print("i " + ip.var_id + "   " + variables[rp.var_id].name + "  " + str(variables[rp.var_id].value))
                                     variables[ip.var_id] = variables[rp.var_id]
+                                    print(ip.name + " " + str(rp.value) + str(variables[rp.var_id].value))
+                                    print("i " + ip.var_id + "   " + variables[ip.var_id].name + "  " + str(variables[ip.var_id].value))
                                 elif rp.vtype == "OPEN+":
                                     plus = rp.name.split("*")[0]
                                     star = "*"+rp.name.split("*")[1]
                                     #print(ip.var_id+"-0"+"     "+rp.var_id)
                                     if plus == ip.name:
-                                        print("g " + ip.var_id+"-0" + "   " + variables[rp.var_id].name + "  " + str(variables[rp.var_id].value))
                                         variables[ip.var_id+"-0"] = variables[rp.var_id]
+                                        print("g " + ip.var_id+"-0" + "   " + variables[ip.var_id+"-0"].name + "  " + str(variables[ip.var_id+"-0"].value))
                                     elif star == ip.name:
-                                        print("h " + ip.var_id + "-1" + "   " + variables[rp.var_id].name + "  " + str(variables[rp.var_id].value))
                                         variables[ip.var_id+"-1"] = variables[rp.var_id]
+                                        print("h " + ip.var_id + "-1" + "   " + variables[ip.var_id+"-1"].name + "  " + str(variables[ip.var_id+"-1"].value))
 
                     exec_queue.enqueue(ri)
+            print("END OF FOR")
 
 if __name__ == "__main__":
     run()
