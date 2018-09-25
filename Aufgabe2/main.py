@@ -41,9 +41,9 @@ def run():
         exec_queue.enqueue(ri)
         # put all parameters into the variables list
         # will be put into dict later, why here?
-        for ip in ri.body.params:
-            print("a " + ip.var_id + "   " + ip.name + " " + str(ip.value))
-            variables[ip.var_id] = ip
+        for iparam in ri.body.params:
+            print("a " + iparam.var_id + "   " + iparam.name + " " + str(iparam.value))
+            variables[iparam.var_id] = iparam
 
     while not exec_queue.is_empty():
         instr = exec_queue.dequeue()
@@ -108,22 +108,22 @@ def run():
                     if ri.body.ret:
                         variables[rule.body.ret.var_id] = ri.body.ret
                     if ri.body.params:
-                        for ip in ri.body.params:
-                            for rp in rule.body.params:
-                                if ip.name == rp.name:
-                                    variables[ip.var_id] = variables[rp.var_id]
-                                    print(ip.name + " " + str(rp.value) + str(variables[rp.var_id].value))
-                                    print("i " + ip.var_id + "   " + variables[ip.var_id].name + "  " + str(variables[ip.var_id].value))
-                                elif rp.vtype == "OPEN+":
-                                    plus = rp.name.split("*")[0]
-                                    star = "*"+rp.name.split("*")[1]
+                        for iparam in ri.body.params:
+                            for rparam in rule.body.params:
+                                if iparam.name == rparam.name:
+                                    variables[iparam.var_id] = variables[rparam.var_id]
+                                    print(iparam.name + " " + str(rparam.value) + str(variables[rparam.var_id].value))
+                                    print("i " + iparam.var_id + "   " + variables[iparam.var_id].name + "  " + str(variables[iparam.var_id].value))
+                                elif rparam.vtype == "OPEN+":
+                                    plus = rparam.name.split("*")[0]
+                                    star = "*"+rparam.name.split("*")[1]
                                     #print(ip.var_id+"-0"+"     "+rp.var_id)
-                                    if plus == ip.name:
-                                        variables[ip.var_id+"-0"] = variables[rp.var_id]
-                                        print("g " + ip.var_id+"-0" + "   " + variables[ip.var_id+"-0"].name + "  " + str(variables[ip.var_id+"-0"].value))
-                                    elif star == ip.name:
-                                        variables[ip.var_id+"-1"] = variables[rp.var_id]
-                                        print("h " + ip.var_id + "-1" + "   " + variables[ip.var_id+"-1"].name + "  " + str(variables[ip.var_id+"-1"].value))
+                                    if plus == iparam.name:
+                                        variables[iparam.var_id+"-0"] = variables[rparam.var_id]
+                                        print("g " + iparam.var_id+"-0" + "   " + variables[iparam.var_id+"-0"].name + "  " + str(variables[iparam.var_id+"-0"].value))
+                                    elif star == iparam.name:
+                                        variables[iparam.var_id+"-1"] = variables[rparam.var_id]
+                                        print("h " + iparam.var_id + "-1" + "   " + variables[iparam.var_id+"-1"].name + "  " + str(variables[iparam.var_id+"-1"].value))
 
                     exec_queue.enqueue(ri)
             print("END OF FOR")
