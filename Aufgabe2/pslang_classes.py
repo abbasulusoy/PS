@@ -302,6 +302,7 @@ class Matcher:
         :param rule: rule instance
         :return: true if both instances have the same name and number of parameters and if both are shell commands
         '''
+        #print(instr.name + " is " + str(instr.is_shell) + "; " + rule.name + " is " + str(rule.is_shell))
         return instr.is_shell == rule.is_shell and instr.name == rule.name and len(instr.body.params) == len(
             rule.body.params) and Matcher.check_param_types(instr.body.params, rule.body.params)
 

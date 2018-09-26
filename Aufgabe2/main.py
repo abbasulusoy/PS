@@ -14,7 +14,7 @@ def run():
     4. execute parsed rule and next instructions into queue
     '''
     if len(sys.argv) != 3:
-        #print("Usage:\npython main.py <FILE-CONTAINING-PROGRAM> <FILE-CONTAINING-FIRST-GOAL(S)>")
+        print("Usage:\npython main.py <FILE-CONTAINING-PROGRAM> <FILE-CONTAINING-FIRST-GOAL(S)>")
         exit(1)
     with open(sys.argv[1], 'r') as file_program:
         str_program = file_program.read()
@@ -53,16 +53,16 @@ def run():
                 continue
             # found rule to executeparse_instructions
 
-
             ##print("****")
             #for s in variables:
             #    #print(variables[s])
 
-
             # set param values
             for rparam, iparam in zip(rule.body.params, instr.body.params):
                 if rparam.vtype == "OPEN+":
-                    value = variables[iparam.var_id].value
+                    #print(iparam.var_id + " " + iparam.name + " " + str(iparam.value))
+                    var_id = getId(iparam, variables)
+                    value = variables[var_id].value
 
                     var = Variable(rparam.name, "OPEN+", value)
                     variables[rparam.var_id] = var
@@ -70,10 +70,12 @@ def run():
 
                     var = Variable(rparam.name.split("*")[0], "CLOSED", [value[0]])
                     variables[rparam.var_id+"-0"] = var
+                    #print("A " + rparam.var_id + "-0 " + var.name + " " + str(var.value))
                     #print("B: VARIABLES[" + rparam.var_id + "-0]: " + str(variables[rparam.var_id+"-0"].value))
 
                     var = Variable("*"+rparam.name.split("*")[1], "OPEN", value[1:])
                     variables[rparam.var_id+"-1"] = var
+                    #print("B " + rparam.var_id+"-1 " + var.name + " " + str(var.value))
                     #print("C: VARIABLES[" + rparam.var_id + "-1]: " + str(variables[rparam.var_id+"-1"].value))
                 elif rparam.vtype == "OPEN":
                     if iparam.var_id+"-1" in variables:
@@ -86,10 +88,11 @@ def run():
                         #print("D2: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
                 else:
                     if iparam.var_id+"-0" in variables:
-                        var = Variable(rparam.name, "CLOSED", variables[iparam.var_id + "-0"].value)
+                        var = Variable(rparam.name, "CLOSED", variables[iparam.var_id+"-0"].value)
                         variables[rparam.var_id+"-0"] = var
                         #print("E1: VARIABLES[" + rparam.var_id+"-0]: " + str(variables[rparam.var_id+"-0"].value))
                     else:
+                        #print(rule.name + " " + rparam.name + " " + str(variables[iparam.var_id].value))
                         var = Variable(rparam.name, "CLOSED", variables[iparam.var_id].value)
                         variables[rparam.var_id] = var
                         #print("E2: VARIABLES[" + rparam.var_id + "]: " + str(variables[rparam.var_id].value))
@@ -99,12 +102,21 @@ def run():
             #    #print(x)
             #    #print(variables[x].name +": "+variables[x].value)
             if rule.is_shell:
-                ##print(rule.body.instructions)
+                #print("IS SHELL")
                 for param in rule.body.params:
                     id = getId(param, variables)
-                    rule.body.instructions = re.sub(
-                        r"(?<!\\)" + variables[id].name.replace("+", "\+").replace("*", "\*") + r"(?!\w)",
-                        " ".join(variables[id].value), rule.body.instructions)
+                    var = variables[id]
+                    tmp = {var.name: var.value}
+                    if param.vtype == "OPEN+":
+                        tmp = {
+                            var.name.split("*")[0]: [var.value[0]],
+                            "*" + var.name.split("*")[1]: var.value[1:]
+                        }
+                    for name in tmp:
+                        rule.body.instructions = re.sub(
+                            r"(?<!\\)" + name.replace("+", "\+").replace("*", "\*") + r"(?!\w)",
+                            " ".join(tmp[name]), rule.body.instructions)
+                #print(rule.body.instructions)
                 executor.execute_shell_instruction(rule, instr)
                 # TODO: return wert in variable-liste ersetzen
                 if instr.body.ret:
@@ -122,7 +134,8 @@ def run():
                         for iparam in ri.body.params:
                             for rparam in rule.body.params:
                                 ##print(rparam.name + "  " + rparam.vtype)
-                                var = Variable(variables[rparam.var_id+"-0"].name, "", [])
+                                var_id = getId(rparam, variables)
+                                var = Variable(variables[var_id].name, "", [])
                                 if iparam.name == rparam.name:
                                     var.vtype = iparam.vtype
                                     id = getId(rparam, variables)
@@ -134,31 +147,36 @@ def run():
                                     star = "*"+rparam.name.split("*")[1]
                                     if plus == iparam.name:
                                         var.vtype = "CLOSED"
-                                        var.value = variables[rparam.var_id+"-0"].value
+                                        var.value = variables[var_id].value
                                         variables[iparam.var_id+"-0"] = var
                                         #print("G: VARIABLES[" + iparam.var_id + "-0]: " + str(variables[iparam.var_id+"-0"].value))
                                     elif star == iparam.name:
                                         var.vtype = "OPEN"
-                                        var.value = variables[rparam.var_id+"-1"].value
+                                        var.value = variables[var_id].value
                                         variables[iparam.var_id+"-1"] = var
                                         #print("H: VARIABLES[" + iparam.var_id + "-1]: " + str(variables[iparam.var_id+"-1"].value))
-
                     exec_queue.enqueue(ri)
+            break
             #print("END OF FOR")
 
 
 def getId(id, variables):
     if id.vtype == "OPEN":
         if id.var_id + "-1" in variables:
+            #print("OPEN 1")
             return id.var_id + "-1"
         else:
+            #print("OPEN 2")
             return id.var_id
     elif id.vtype == "CLOSED":
         if id.var_id + "-0" in variables:
+            #print("CLOSED 1")
             return id.var_id + "-0"
         else:
+            #print("CLOSED 2")
             return id.var_id
     else:
+        #print("RETURN")
         return id.var_id
 
 
