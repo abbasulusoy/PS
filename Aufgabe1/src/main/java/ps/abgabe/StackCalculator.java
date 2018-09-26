@@ -52,9 +52,7 @@ public class StackCalculator {
         for (String s : inputStream.getList()) {
             System.out.println("Item ::" + s);
         }
-
         Iterator<String> iter = inputStream.iterator();
-
         while (iter.hasNext()) {
             String token = inputStream.pop();
             if (calculator.isUnaryOperator(token)) {
