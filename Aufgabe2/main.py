@@ -53,6 +53,15 @@ def run():
 
             # found rule to executeparse_instructions
 
+            #params_in_variable = True
+            #for p in instr.body.params:
+            #    if p not in variables:
+            #        params_in_variable = False
+
+            #if not params_in_variable:
+            #    exec_queue.enqueue(instr)
+            #    break
+
             # set param values
             for rparam, iparam in zip(rule.body.params, instr.body.params):
                 if rparam.vtype == "OPEN+":
@@ -100,12 +109,21 @@ def run():
                 executor.execute_shell_instruction(rule, instr)
                 # TODO: return wert in variable-liste ersetzen
                 if instr.body.ret:
-                    variables[rule.body.ret.var_id] = instr.body.ret
+                    variables[instr.body.ret.var_id] = instr.body.ret
             else:
+                for instr1 in rule.body.instructions:
+                    if not instr1.body.ret:
+                        continue
+                    for instr2 in rule.body.instructions:
+                        if instr1 == instr2:
+                            continue
+                        for p in instr2.body.params:
+                            if p.name == instr1.body.ret.name:
+                                variables[p.var_id] = instr1.body.ret
+                                break
+
                 # put all instructions into the queue
                 for ri in rule.body.instructions:
-                    if ri.body.ret:
-                        variables[rule.body.ret.var_id] = ri.body.ret
                     if ri.body.params:
                         for iparam in ri.body.params:
                             for rparam in rule.body.params:
@@ -128,6 +146,13 @@ def run():
                                         var.value = variables[var_id].value[1:]
                                         variables[iparam.var_id+"-1"] = var
                     exec_queue.enqueue(ri)
+
+                # TODO: return wert in variable-liste ersetzen
+                if instr.body.ret:
+                    # TODO: return wert von param oder instructions auslesen und gegebenenfalls in ret speichern
+                    # TODO: zum Beispiel bei r:(+a*b)()(+a). sollte der ret wert den param wert einnehmen
+                    # TODO: oder zum Beispiel bei r1:(+a)(r2(+a)(*b);)(*b). sollte *b den return wert von der instruction bekommen
+                    variables[instr.body.ret.var_id] = instr.body.ret
             break
 
 

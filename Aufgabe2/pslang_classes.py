@@ -88,7 +88,11 @@ class Parser:
         :return:
         '''
         str = str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
-        return Variable(str, "OPEN", str.split(" "))
+        ret = str.split(" ")
+        if len(ret) == 1 and ret[0] == '':
+            return None
+        else:
+            return Variable(str, "OPEN", str.split(" "))
 
     def first_alphabetical_substring(self, string):
         '''
