@@ -42,7 +42,6 @@ def run():
         # put all parameters into the variables list
         # will be put into dict later, why here?
         for iparam in ri.body.params:
-
             variables[iparam.var_id] = Variable(iparam.name, iparam.vtype, iparam.value)
 
     while not exec_queue.is_empty():
