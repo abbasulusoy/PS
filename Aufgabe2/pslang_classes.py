@@ -302,7 +302,6 @@ class Matcher:
         :param rule: rule instance
         :return: true if both instances have the same name and number of parameters and if both are shell commands
         '''
-        #print(instr.name + " is " + str(instr.is_shell) + "; " + rule.name + " is " + str(rule.is_shell))
         return instr.is_shell == rule.is_shell and instr.name == rule.name and len(instr.body.params) == len(
             rule.body.params) and Matcher.check_param_types(instr.body.params, rule.body.params)
 
@@ -328,8 +327,6 @@ class Executor:
         pass
 
     def execute_shell_instruction(self, rule, instr):
-        # TODO: alle parameter in shell command ersetzen und dann ausfuehren
-
         output = subprocess.check_output(rule.body.instructions, shell=True).decode('ascii')
         if rule.body.ret:
             instr.body.ret.value = output.split("\n")
