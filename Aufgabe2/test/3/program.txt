@@ -1,0 +1,3 @@
+main:(+a*b)($r1(*b)();$r2(+a)();)().
+$r1:(+a*b)(echo +a;echo *b;)().
+$r2:(+c)(echo finally +c;)().

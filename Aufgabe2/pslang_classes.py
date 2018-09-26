@@ -31,6 +31,12 @@ class Variable:
         self.vtype = vtype
         self.value = value
 
+    @staticmethod
+    def copyOf(var):
+        tmp = Variable(var.name, var.vtype, var.value)
+        tmp.var_id = var.var_id
+        return tmp
+
 
 class Parser:
     def __init__(self):
@@ -66,7 +72,7 @@ class Parser:
         '''
         idx_opening_parantheses = -1
         for i, c in enumerate(str_instruction):
-            if c.isalpha() or c == '$':
+            if c.isalnum() or c == '$':
                 continue
             idx_opening_parantheses = i
             break
@@ -82,7 +88,7 @@ class Parser:
         :return:
         '''
         str = str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
-        return Variable(str, "OPEN", str)
+        return Variable(str, "OPEN", str.split(" "))
 
     def first_alphabetical_substring(self, string):
         '''
@@ -93,7 +99,7 @@ class Parser:
         '''
         result = []
         for c in string:
-            if c.isalpha():
+            if c.isalnum():
                 result.append(c)
             else:
                 break
@@ -238,13 +244,13 @@ class Parser:
                 # .split(',') on an empty string will return ['']
                 # which should be ignored
                 continue
-            par = Variable(p, "", p)
+            par = Variable(p, "", p.split(" "))
             if '*' in p and '+' in p:
-                par.ptype = "OPEN+"
-            elif '*' in p or len(p.strip().split(' ')) > 1:
-                par.ptype = "OPEN"
+                par.vtype = "OPEN+"
+            elif '*' in p or len(p.split(" ")) > 1:
+                par.vtype = "OPEN"
             else:
-                par.ptype = "CLOSED"
+                par.vtype = "CLOSED"
             params.append(par)
         return params
 
@@ -309,19 +315,21 @@ class Matcher:
         :return:
         '''
         for ip, rp in zip(instr_params, rule_params):
-            if ip.ptype != rp.ptype:
-                return False
-        return True
+            if rp.vtype == ip.vtype:
+                return True
+            if rp.vtype == "OPEN+" and ip.vtype == "OPEN":
+                return True
+        return False
 
 
 class Executor:
     def __init__(self):
         pass
 
-    def execute_shell_instruction(self, rule):
+    def execute_shell_instruction(self, rule, instr):
         # TODO: alle parameter in shell command ersetzen und dann ausfuehren
 
         output = subprocess.check_output(rule.body.instructions, shell=True).decode('ascii')
         if rule.body.ret:
-            rule.body.ret = output
+            instr.body.ret.value = output.split("\n")
         print(output)

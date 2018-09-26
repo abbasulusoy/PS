@@ -1,3 +1,1 @@
-main(/home/fabian/PycharmProjects/PS/Aufgabe2)();
-
-
+main(HalloWelt)();
