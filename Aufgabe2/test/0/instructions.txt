@@ -1,1 +1,1 @@
-main(HelloWorld John Alice)();
+main(HalloWelt)();
