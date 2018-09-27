@@ -338,4 +338,4 @@ class Executor:
         output = subprocess.check_output(rule.body.instructions, shell=True).decode('ascii')
         if rule.body.ret:
             instr.body.ret.value = output.split("\n")
-        print(output)
+        print("++"+output)

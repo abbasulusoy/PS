@@ -148,11 +148,25 @@ def run():
                     exec_queue.enqueue(ri)
 
                 # TODO: return wert in variable-liste ersetzen
-                if instr.body.ret:
+                #if instr.body.ret:
+                    #print("A "+instr.name)
+
                     # TODO: return wert von param oder instructions auslesen und gegebenenfalls in ret speichern
                     # TODO: zum Beispiel bei r:(+a*b)()(+a). sollte der ret wert den param wert einnehmen
                     # TODO: oder zum Beispiel bei r1:(+a)(r2(+a)(*b);)(*b). sollte *b den return wert von der instruction bekommen
-                    variables[instr.body.ret.var_id] = instr.body.ret
+
+                    #for p in instr.body.params:
+                        #print("B "+instr.name + "   " + instr.body.ret.name + "   " + p.name)
+                    #    if instr.body.ret.name in p.name:
+                    #        print("found")
+                    #        variables[instr.body.ret.var_id] = variables[getId(p.var_id, variables)]
+
+                    #for i in instr.body.instructions:
+                    #    print("instruct")
+                    #    if instr.body.ret.name == i.body.ret.name:
+                    #        print("fooound")
+                    #        variables[instr.body.ret.var_id] = variables[getId(i.body.ret.name, variables)]
+
             break
 
 
