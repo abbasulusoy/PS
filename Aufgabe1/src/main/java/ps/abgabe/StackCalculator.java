@@ -15,7 +15,6 @@ public class StackCalculator {
     DataStack<String> inputs = new DataStack<String>();
     Calculator calculator = new Calculator();
 
-
     /**
      * Evaluates the expression
      * 
@@ -27,11 +26,10 @@ public class StackCalculator {
     public void evaluate(String expression) {
         String[] exprArray = null;
         DataStack<String> inputStream = new DataStack<>();
-        DataStack<String> outputs = new DataStack<>();
-        outputs.push("3");
 
         exprArray = expression.split("");
         String resul = "";
+
 
         while (expression.contains("(")) {
             String list = generateList(expression, outputs);
@@ -55,8 +53,29 @@ public class StackCalculator {
         }
         Iterator<String> iter = inputStream.iterator();
         while (iter.hasNext()) {
+            System.out.println();
             String token = inputStream.pop();
-            if (calculator.isUnaryOperator(token)) {
+            System.out.println("token ::" + token);
+            System.out.println("inputs ::");
+            for (String s : inputStream.getList()) {
+                System.out.print(s + " next ");
+            }
+            System.out.println();
+            System.out.println("Outputs ::");
+            for (String s : outputs.getList()) {
+                System.out.print(s + " ##");
+            }
+            if (token.equals(" ")) {
+                continue;
+            }
+            if (calculator.isItemList(token)) {
+                if (token.length() == 3) {
+                    outputs.push("0");
+                } else {
+                outputs.push(token);
+                }
+            }
+            else if (calculator.isUnaryOperator(token)) {
                 calculator.evaluateUnaryOperator(token, inputStream, outputs);
             } else if (calculator.isBinaryOperator(token)) {
                 calculator.evaluateOperator(token, outputs);
