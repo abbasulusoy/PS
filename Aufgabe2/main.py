@@ -162,7 +162,6 @@ def run():
                                     variables[instr.body.ret.var_id] = instr.body.ret
                             else:
                                 if rpar.name == rule.body.ret.name:
-                                    print("B " + instr.body.ret.var_id)
                                     #var.value = par.value
                                     #variables[instr.body.ret.var_id] = var
                                     variables[instr.body.ret.var_id] = instr.body.ret
