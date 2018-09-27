@@ -88,7 +88,11 @@ class Parser:
         :return:
         '''
         str = str_instruction[self.find_last_non_escaped_char(str_instruction, '(') + 1:-1]
-        return Variable(str, "OPEN", str.split(" "))
+        ret = str.split(" ")
+        if len(ret) == 1 and ret[0] == '':
+            return None
+        else:
+            return Variable(str, "OPEN", str.split(" "))
 
     def first_alphabetical_substring(self, string):
         '''
@@ -207,7 +211,9 @@ class Parser:
         '''
         idx_semicolon = str_rule.find(':')
         idx_params_end = self.find_first_non_escaped_char(str_rule, ')')
-        str_params = str_rule[idx_semicolon + 2:idx_params_end]
+        str_params = ""
+        if str_rule[idx_semicolon + 2] != str_rule[idx_params_end]:
+            str_params = str_rule[idx_semicolon + 2:idx_params_end]
         return self.parse_params(str_params)
 
     def get_instructions_of_raw_rule(self, str_rule):
@@ -319,6 +325,8 @@ class Matcher:
                 return True
             if rp.vtype == "OPEN+" and ip.vtype == "OPEN":
                 return True
+        if len(rule_params) == 0 and len(instr_params) == 0:
+            return True
         return False
 
 
@@ -327,8 +335,6 @@ class Executor:
         pass
 
     def execute_shell_instruction(self, rule, instr):
-        # TODO: alle parameter in shell command ersetzen und dann ausfuehren
-
         output = subprocess.check_output(rule.body.instructions, shell=True).decode('ascii')
         if rule.body.ret:
             instr.body.ret.value = output.split("\n")
