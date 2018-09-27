@@ -118,6 +118,9 @@ public class Calculator {
                     result = null;
                 }
                 break;
+            case "=":
+                result = equals(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
+                break;
             case "<":
                 result = smaller(getIntValue(dataStack.pop()), getIntValue(dataStack.pop()));
                 break;
@@ -176,6 +179,9 @@ public class Calculator {
                 break;
             case "!":
                 divideList(outputs.pop(), outputs);
+                break;
+            case "p":
+                primeFactors(outputs.pop(), outputs);
                 break;
             case "z":
                 applyLater(outputs.pop(), inputStreams);
@@ -346,19 +352,64 @@ public class Calculator {
      * @param item
      * @param arguments
      */
-    private void applimmediately(String item, DataStack<String> arguments) {
+    public void applimmediately(String item, DataStack<String> arguments) {
         if (!isItemList(item)) {
             throw new IllegalArgumentException("this Item :: " + item + " is not a list");
         }
-        String result = item.replace("(", "").replace(")", "");
-        String reverse = "";
-        for (int i = result.length() - 1; i >= 0; i--) {
-            reverse = reverse + result.charAt(i);
+        String result = item.substring(1, item.length() - 1);
+        if (result.contains("(") || result.contains(")")) {
+            List<String> valuesSplitted = new ArrayList<>();
+            for (String s : result.split("\\(")) {
+                if (s.contains(")")) {
+                    s = "(" + s;
+                    for (String otherSide : s.split("\\)")) {
+                        if (otherSide.contains("(")) {
+                            otherSide = otherSide + ")";
+                            valuesSplitted.add(otherSide);
+                        } else {
+                            reverseStringAndAddToList(valuesSplitted, otherSide);
+                        }
+                    }
+                } else {
+                    reverseStringAndAddToList(valuesSplitted, s);
+
+                }
+            }
+            Collections.reverse(valuesSplitted);
+            for (String s : valuesSplitted) {
+                arguments.push(s);
+            }
+        } else {
+            List<String> list = new ArrayList<>();
+            reverseStringAndAddToList(list, result);
+
+            Collections.reverse(list);
+            for (String s : list) {
+                arguments.push(s);
+            }
         }
 
-        for (String s : reverse.split("")) {
-            arguments.push(s);
+    }
+
+    private void reverseStringAndAddToList(List<String> list, String s) {
+        for (String itemS : s.split("")) {
+            list.add(itemS);
         }
+    }
+
+    private void reverseStringAndAddToStack(DataStack<String> list, String s) {
+        String reverse = reverseString(s);
+        for (String itemS : reverse.split("")) {
+            list.push(itemS);
+        }
+    }
+
+    private String reverseString(String s) {
+        String reverse = "";
+        for (int i = s.length() - 1; i >= 0; i--) {
+            reverse = reverse + s.charAt(i);
+        }
+        return reverse;
     }
 
     /**
@@ -371,9 +422,7 @@ public class Calculator {
      */
     private void delete(String find, DataStack<String> arguments) {
         if (isIntegerPositiv(find)) {
-            Collections.reverse(arguments.getList());
             arguments.removeWithIndex(converToNumber(find) - 1);
-            // Collections.reverse(arguments.getList());
         }
     }
 
@@ -388,9 +437,10 @@ public class Calculator {
      */
     private void copy(String find, DataStack<String> outputs) {
         if (isIntegerPositiv(find)) {
-            String result = outputs.get(converToNumber(find) - 1);
+            String result = outputs.get(converToNumber(find));
             outputs.pop();
             outputs.push(result);
+
         }
 
     }
@@ -400,7 +450,7 @@ public class Calculator {
      * @param item
      * @return check, is item a list
      */
-    private boolean isItemList(String item) {
+    public boolean isItemList(String item) {
         if (item.startsWith("(") && item.endsWith(")")) {
             return true;
         } else {
@@ -503,6 +553,22 @@ public class Calculator {
     }
 
     /**
+     * comparison two numbers for equals ==
+     *
+     * @param a
+     *            first number
+     * @param b
+     *            second number
+     * @return result
+     */
+    private int equals(Integer firstNumber, Integer secondNumber) {
+        if (firstNumber == secondNumber) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
      * comparison two numbers for smaller
      *
      * @param a
@@ -567,6 +633,14 @@ public class Calculator {
 
     private boolean isDivideList(String s) {
         if (s.equals("!")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isPrimary(String s) {
+        if (s.equals("p")) {
             return true;
         } else {
             return false;
@@ -729,10 +803,24 @@ public class Calculator {
      * @param token
      * @return left associative
      */
+    public static boolean isContainsBinaryOperator(String token) {
+        if (token.contains("*") || token.contains("/") || token.contains("+") || token.contains("-")
+                || token.contains("%") || token.contains("|") || token.contains("=") || token.contains("<")
+                || token.contains(">")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param token
+     * @return left associative
+     */
     public boolean isUnaryOperator(String token) {
         if (isNegation(token) || isExit(token) || isApplyImmediately(token) || isApplyLater(token) || isDelete(token)
                 || isReadRegister(token) || isWriteRegister(token) || isCopy(token) || isInteger(token)
-                || isNoEmptyListCheck(token) || isStackSize(token) || isDivideList(token) || isCombine(token)) {
+                || isNoEmptyListCheck(token) || isStackSize(token) || isDivideList(token) || isCombine(token)
+                || isPrimary(token)) {
             return true;
         }
         return false;
@@ -743,20 +831,52 @@ public class Calculator {
      * 
      * @param number
      */
-    public static void primeFactors(int number) {
-        // Print the number of 2s that divide n
-        while (number % 2 == 0) {
-            number /= 2;
+    // of a given number n 
+    public static void primeFactors(String sNumber, DataStack<String> outputs) {
+        // Print the number of 2s that divide n 
+        int n = Integer.valueOf(sNumber);
+        String result = "";
+        while (n % 2 == 0) {
+            result += 2 + " ";
+            n /= 2;
         }
-        for (int i = 3; i <= Math.sqrt(number); i += 2) {
-            // While i divides n, print i and divide n
-            while (number % i == 0) {
-                System.out.print(i + " ");
-                number /= i;
+
+        // n must be odd at this point. So we can 
+        // skip one element (Note i = i +2) 
+        for (int i = 3; i <= Math.sqrt(n); i += 2) {
+            // While i divides n, print i and divide n 
+            while (n % i == 0) {
+                result += i + " ";
+                n /= i;
             }
         }
 
-        if (number > 2)
-            System.out.print(number);
+        // This condition is to handle the case whien 
+        // n is a prime number greater than 2 
+        if (n > 2)
+            result += n;
+        outputs.push(result);
+    }
+
+    public static String generateList(String expression, DataStack<String> outputs) {
+
+        int open = 0;
+        String list = "";
+
+        for (int i = 0; i < expression.length(); i++) {
+            if (expression.charAt(i) == '(') {
+                open++;
+            } else if (expression.charAt(i) == ')') {
+
+                open--;
+            }
+            if (open > 0) {
+                list += expression.charAt(i);
+            } else {
+                list += expression.charAt(i);
+                break;
+            }
+        }
+        return list;
     }
 }
