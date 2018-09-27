@@ -103,7 +103,7 @@ def run():
                         }
                     for name in tmp:
                         rule.body.instructions = re.sub(
-                            r"(?<!\\)" + name.replace("+", "\+").replace("*", "\*") + r"(?!\w)",
+                            r"(?<!\\)" + name.replace("+", "\\+").replace("*", "\\*") + r"(?!\w)",
                             " ".join(tmp[name]), rule.body.instructions)
 
                 executor.execute_shell_instruction(rule, instr)
@@ -146,6 +146,26 @@ def run():
                                         var.value = variables[var_id].value[1:]
                                         variables[iparam.var_id+"-1"] = var
                     exec_queue.enqueue(ri)
+
+                if not rule.body.instructions:
+                    if rule.body.params and rule.body.ret:
+                        for rpar, ipar in zip(rule.body.params, instr.body.params):
+                            #var = Variable(par.name, "", par.value)
+                            if rpar.vtype == "OPEN+":
+                                star = "*" + rpar.name.split("*")[1]
+                                # return values have to be OPEN per definition
+                                if star == rule.body.ret.name:
+                                    #var.vtype = "OPEN"
+                                    #var.value = par.value[1:]
+                                    #variables[instr.body.ret.var_id] = var
+                                    instr.body.ret.value = variables[instr.body.params[0].var_id].value[1:]
+                                    variables[instr.body.ret.var_id] = instr.body.ret
+                            else:
+                                if rpar.name == rule.body.ret.name:
+                                    print("B " + instr.body.ret.var_id)
+                                    #var.value = par.value
+                                    #variables[instr.body.ret.var_id] = var
+                                    variables[instr.body.ret.var_id] = instr.body.ret
 
                 # TODO: return wert in variable-liste ersetzen
                 #if instr.body.ret:
