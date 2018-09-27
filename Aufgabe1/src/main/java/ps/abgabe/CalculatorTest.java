@@ -11,6 +11,7 @@ public class CalculatorTest {
 
     public static void main(String[] args) {
         StackCalculator calculator = new StackCalculator();
+
         Scanner sc = new Scanner(System.in);
         System.out.println("Welcome the to stack based calculator");
         for (;;) {
