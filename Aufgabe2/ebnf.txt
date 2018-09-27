@@ -1,0 +1,11 @@
+<program> ::= { <rule> }
+<rule> ::= <head> <body> '.'
+<head> ::= ['$'] <name> ':'
+<body> ::= '(' <param> ')' '(' { <instruction> } ')' '(' <return> ')'
+<instruction> ::= (<command>|<shell>) ';'
+<shell> :: '$' <command>
+<command> ::=  <name> '(' <param> ')' '(' <return> ')'
+<return> ::= '*' <token>
+<param> ::= [ <pattern> { ',' <pattern> } ]
+<pattern> ::= { [ ’+’ ] <token> } [ ’*’ <token> ]
+<name> ::= <token>

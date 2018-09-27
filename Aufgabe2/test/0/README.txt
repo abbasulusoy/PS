@@ -1,1 +1,16 @@
-should print "Hello World"
+prints content from "TODO.txt"
+
+INPUT:
+TODO.txt
+
+EXPECTED OUTPUT:
+1. Variable-Matching:
+	1.1 Nachdem Rule und Parameter gematcht wurden muss Wert in Variable(value) eingesetzt werden
+	1.2 Variablen-Liste befuellen (nach dem Instruction Matching) mit neuer Variablen-Instanz mit Namen (Rule-Name + Variablen-Name)
+	1.3 Alle Vorkommnisse von Name werden durch Wert ersetzt (in der spezifischen Rule) auch in verschachtelten Methoden
+
+2. Ausfuehrung:
+	2.1 Neue Variablen in Variablen-Liste aufnehmen
+3. Return-Werte:
+	3.1 Nach Ausfuehrung return-Wert in die Variablen-Liste einfuegen
+

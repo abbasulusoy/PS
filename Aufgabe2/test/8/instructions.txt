@@ -1,1 +1,1 @@
-main(HelloWorld John Alice)();
+main(testfile.txt, irgend ein Text)();
