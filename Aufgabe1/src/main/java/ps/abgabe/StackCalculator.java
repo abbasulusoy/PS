@@ -15,6 +15,7 @@ public class StackCalculator {
     DataStack<String> inputs = new DataStack<String>();
     Calculator calculator = new Calculator();
 
+
     /**
      * Evaluates the expression
      * 
@@ -27,7 +28,7 @@ public class StackCalculator {
         String[] exprArray = null;
         DataStack<String> inputStream = new DataStack<>();
         DataStack<String> outputs = new DataStack<>();
-        outputs.push("0");
+        outputs.push("3");
 
         exprArray = expression.split("");
         String resul = "";
@@ -94,6 +95,34 @@ public class StackCalculator {
             }
         }
         return list;
+    }
+
+    public DataStack<String> getOutputs() {
+        return outputs;
+    }
+
+    /**
+     * getter and setters 
+     * @param outputs
+     */
+    public void setOutputs(DataStack<String> outputs) {
+        this.outputs = outputs;
+    }
+
+    public DataStack<String> getInputs() {
+        return inputs;
+    }
+
+    public void setInputs(DataStack<String> inputs) {
+        this.inputs = inputs;
+    }
+
+    public Calculator getCalculator() {
+        return calculator;
+    }
+
+    public void setCalculator(Calculator calculator) {
+        this.calculator = calculator;
     }
 
     public static void main(String[] args) {
