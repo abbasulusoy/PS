@@ -180,6 +180,9 @@ public class Calculator {
             case "!":
                 divideList(outputs.pop(), outputs);
                 break;
+            case "p":
+                primeFactors(outputs.pop(), outputs);
+                break;
             case "z":
                 applyLater(outputs.pop(), inputStreams);
                 break;
@@ -349,7 +352,7 @@ public class Calculator {
      * @param item
      * @param arguments
      */
-    private void applimmediately(String item, DataStack<String> arguments) {
+    public void applimmediately(String item, DataStack<String> arguments) {
         if (!isItemList(item)) {
             throw new IllegalArgumentException("this Item :: " + item + " is not a list");
         }
@@ -636,6 +639,14 @@ public class Calculator {
         }
     }
 
+    private boolean isPrimary(String s) {
+        if (s.equals("p")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private boolean isCombine(String s) {
         if (s.equals(":")) {
             return true;
@@ -792,10 +803,24 @@ public class Calculator {
      * @param token
      * @return left associative
      */
+    public static boolean isContainsBinaryOperator(String token) {
+        if (token.contains("*") || token.contains("/") || token.contains("+") || token.contains("-")
+                || token.contains("%") || token.contains("|") || token.contains("=") || token.contains("<")
+                || token.contains(">")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param token
+     * @return left associative
+     */
     public boolean isUnaryOperator(String token) {
         if (isNegation(token) || isExit(token) || isApplyImmediately(token) || isApplyLater(token) || isDelete(token)
                 || isReadRegister(token) || isWriteRegister(token) || isCopy(token) || isInteger(token)
-                || isNoEmptyListCheck(token) || isStackSize(token) || isDivideList(token) || isCombine(token)) {
+                || isNoEmptyListCheck(token) || isStackSize(token) || isDivideList(token) || isCombine(token)
+                || isPrimary(token)) {
             return true;
         }
         return false;
@@ -806,21 +831,31 @@ public class Calculator {
      * 
      * @param number
      */
-    public static void primeFactors(int number) {
-        // Print the number of 2s that divide n
-        while (number % 2 == 0) {
-            number /= 2;
+    // of a given number n 
+    public static void primeFactors(String sNumber, DataStack<String> outputs) {
+        // Print the number of 2s that divide n 
+        int n = Integer.valueOf(sNumber);
+        String result = "";
+        while (n % 2 == 0) {
+            result += 2 + " ";
+            n /= 2;
         }
-        for (int i = 3; i <= Math.sqrt(number); i += 2) {
-            // While i divides n, print i and divide n
-            while (number % i == 0) {
-                System.out.print(i + " ");
-                number /= i;
+
+        // n must be odd at this point. So we can 
+        // skip one element (Note i = i +2) 
+        for (int i = 3; i <= Math.sqrt(n); i += 2) {
+            // While i divides n, print i and divide n 
+            while (n % i == 0) {
+                result += i + " ";
+                n /= i;
             }
         }
 
-        if (number > 2)
-            System.out.print(number);
+        // This condition is to handle the case whien 
+        // n is a prime number greater than 2 
+        if (n > 2)
+            result += n;
+        outputs.push(result);
     }
 
     public static String generateList(String expression, DataStack<String> outputs) {

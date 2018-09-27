@@ -24,33 +24,7 @@ public class StackCalculator {
      * @return string - result as a string
      */
     public void evaluate(String expression) {
-        String[] exprArray = null;
-        DataStack<String> inputStream = new DataStack<>();
-
-        exprArray = expression.split("");
-        String resul = "";
-
-
-        while (expression.contains("(")) {
-            String list = generateList(expression, outputs);
-            if (!list.isEmpty()) {
-                outputs.push(list);
-                expression = expression.replace(list, "");
-
-            }
-        }
-
-        if (!expression.contains("(")) {
-            for (String s : expression.split("")) {
-                if (!s.isEmpty()) {
-                    inputStream.push(s);
-                }
-            }
-            Collections.reverse(inputStream.getList());
-        }
-        for (String s : inputStream.getList()) {
-            System.out.println("Item ::" + s);
-        }
+        DataStack<String> inputStream = extractInputStream(expression);
         Iterator<String> iter = inputStream.iterator();
         while (iter.hasNext()) {
             System.out.println();
@@ -72,10 +46,9 @@ public class StackCalculator {
                 if (token.length() == 3) {
                     outputs.push("0");
                 } else {
-                outputs.push(token);
+                    outputs.push(token);
                 }
-            }
-            else if (calculator.isUnaryOperator(token)) {
+            } else if (calculator.isUnaryOperator(token)) {
                 calculator.evaluateUnaryOperator(token, inputStream, outputs);
             } else if (calculator.isBinaryOperator(token)) {
                 calculator.evaluateOperator(token, outputs);
@@ -87,6 +60,70 @@ public class StackCalculator {
         for (String s : outputs.getList()) {
             System.out.println("Result ::" + s);
         }
+    }
+
+    private DataStack<String> extractInputStream(String expression) {
+        DataStack<String> inputStream = new DataStack<>();
+        String navigate = outputs.pop();
+        if (navigate.equals("3") || navigate.equals("0")) {
+            outputs.push(navigate);
+            while (expression.contains("(")) {
+                String list = generateList(expression, outputs);
+                if (!list.isEmpty()) {
+                    outputs.push(list);
+                    expression = expression.replace(list, "");
+
+                }
+            }
+
+            if (!expression.contains("(")) {
+                for (String s : expression.split("")) {
+                    if (!s.isEmpty()) {
+                        inputStream.push(s);
+                    }
+                }
+                Collections.reverse(inputStream.getList());
+            }
+            for (String s : inputStream.getList()) {
+                System.out.println("Item ::" + s);
+            }
+        } else {
+            if (navigate.equals("5")) {
+                calculateWithOutList(expression, inputStream);
+            } else {
+                expression = "(" + expression + ")";
+                calculator.applimmediately(expression, inputStream);
+            }
+        }
+        return inputStream;
+    }
+
+    /**
+     * calculate for sample 5 12+
+     * @param expression
+     * @param inputStream
+     */
+    private void calculateWithOutList(String expression, DataStack<String> inputStream) {
+        for (String s : expression.split(" ")) {
+            if (calculator.isContainsBinaryOperator(s)) {
+                String newValue = "";
+                for (String newS : s.split("")) {
+                    if (calculator.isNumeric(newS)) {
+                        newValue += newS;
+                    } else {
+                        inputStream.push(newS);
+                    }
+                }
+                outputs.push(newValue);
+            } else {
+                if (calculator.isNumeric(s)) {
+                    outputs.push(s);
+                } else {
+                    inputStream.push(s);
+                }
+            }
+        }
+        Collections.reverse(inputStream.getList());
     }
 
     public List<String> getStringFromListToExecute(String strFromList) {
