@@ -51,16 +51,7 @@ def run():
                 # if instruction and rule does not match, ignore
                 continue
 
-            # found rule to executeparse_instructions
-
-            #params_in_variable = True
-            #for p in instr.body.params:
-            #    if p not in variables:
-            #        params_in_variable = False
-
-            #if not params_in_variable:
-            #    exec_queue.enqueue(instr)
-            #    break
+            # found rule to execute
 
             # set param values
             for rparam, iparam in zip(rule.body.params, instr.body.params):
@@ -107,7 +98,6 @@ def run():
                             " ".join(tmp[name]), rule.body.instructions)
 
                 executor.execute_shell_instruction(rule, instr)
-                # TODO: return wert in variable-liste ersetzen
                 if instr.body.ret:
                     variables[instr.body.ret.var_id] = instr.body.ret
             else:
@@ -150,41 +140,15 @@ def run():
                 if not rule.body.instructions:
                     if rule.body.params and rule.body.ret:
                         for rpar, ipar in zip(rule.body.params, instr.body.params):
-                            #var = Variable(par.name, "", par.value)
                             if rpar.vtype == "OPEN+":
                                 star = "*" + rpar.name.split("*")[1]
                                 # return values have to be OPEN per definition
                                 if star == rule.body.ret.name:
-                                    #var.vtype = "OPEN"
-                                    #var.value = par.value[1:]
-                                    #variables[instr.body.ret.var_id] = var
                                     instr.body.ret.value = variables[instr.body.params[0].var_id].value[1:]
                                     variables[instr.body.ret.var_id] = instr.body.ret
                             else:
                                 if rpar.name == rule.body.ret.name:
-                                    #var.value = par.value
-                                    #variables[instr.body.ret.var_id] = var
                                     variables[instr.body.ret.var_id] = instr.body.ret
-
-                # TODO: return wert in variable-liste ersetzen
-                #if instr.body.ret:
-                    #print("A "+instr.name)
-
-                    # TODO: return wert von param oder instructions auslesen und gegebenenfalls in ret speichern
-                    # TODO: zum Beispiel bei r:(+a*b)()(+a). sollte der ret wert den param wert einnehmen
-                    # TODO: oder zum Beispiel bei r1:(+a)(r2(+a)(*b);)(*b). sollte *b den return wert von der instruction bekommen
-
-                    #for p in instr.body.params:
-                        #print("B "+instr.name + "   " + instr.body.ret.name + "   " + p.name)
-                    #    if instr.body.ret.name in p.name:
-                    #        print("found")
-                    #        variables[instr.body.ret.var_id] = variables[getId(p.var_id, variables)]
-
-                    #for i in instr.body.instructions:
-                    #    print("instruct")
-                    #    if instr.body.ret.name == i.body.ret.name:
-                    #        print("fooound")
-                    #        variables[instr.body.ret.var_id] = variables[getId(i.body.ret.name, variables)]
 
             break
 
