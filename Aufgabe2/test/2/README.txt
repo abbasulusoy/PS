@@ -5,9 +5,9 @@ splits given string into 2 lines
 parameters are passed on 2 times
 
 INPUT:
-HelloWorld Hello Cem
+ZeileEins Zeile Zwei
 
 EXPECTED OUTPUT:
-HalloWelt
+ZeileEins
 
-Hallo Cem
+Zeile Zwei

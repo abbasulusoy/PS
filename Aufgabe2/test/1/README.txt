@@ -1,9 +1,9 @@
 splits the string to print into 2 lines
 
 INPUT:
-HalloWelt Hallo Cem
+ZeileEins Zeile Zwei
 
 EXPECTED OUTPUT:
-HalloWelt
+ZeileEins
 
-Hallo Cem
+Zeile Zwei
