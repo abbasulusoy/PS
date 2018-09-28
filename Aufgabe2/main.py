@@ -101,6 +101,7 @@ def run():
                 if instr.body.ret:
                     variables[instr.body.ret.var_id] = instr.body.ret
             else:
+                # set return value to param values if needed
                 for instr1 in rule.body.instructions:
                     if not instr1.body.ret:
                         continue
@@ -137,6 +138,7 @@ def run():
                                         variables[iparam.var_id+"-1"] = var
                     exec_queue.enqueue(ri)
 
+                # if rule has no instructions but param and return, then match variables
                 if not rule.body.instructions:
                     if rule.body.params and rule.body.ret:
                         for rpar, ipar in zip(rule.body.params, instr.body.params):
@@ -154,6 +156,12 @@ def run():
 
 
 def getId(id, variables):
+    '''
+    check if id is in variables, if not then check for id-0 and id-1
+    :param id:
+    :param variables:
+    :return:
+    '''
     if id.vtype == "OPEN":
         if id.var_id + "-1" in variables:
             return id.var_id + "-1"
